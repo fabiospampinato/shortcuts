@@ -1,0 +1,47 @@
+{
+  "name": "shortcuts",
+  "description": "Super performant and feature rich shortcuts management library.",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "clean": "rimraf dist",
+    "compile": "tsc --skipLibCheck && tstei",
+    "compile:watch": "tsc --skipLibCheck --watch",
+    "test": "qunit --require jsdom-global/register --require qunit-ava-spec",
+    "test:watch": "qunit --require jsdom-global/register --require qunit-ava-spec --watch",
+    "demo:build": "cd demo && webpack",
+    "demo:build:watch": "cd demo && webpack --watch",
+    "demo:serve": "cd demo && opn index.html",
+    "prepublishOnly": "npm run clean && npm run compile && npm run test"
+  },
+  "bugs": {
+    "url": "https://github.com/fabiospampinato/shortcuts/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Fabio Spampinato",
+    "email": "spampinabio@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fabiospampinato/shortcuts.git"
+  },
+  "keywords": [
+    "shortcuts",
+    "performant"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "call-spy": "^2.0.1",
+    "jsdom": "^14.0.0",
+    "jsdom-global": "^3.0.2",
+    "opn-cli": "^4.1.0",
+    "qunit": "^2.9.2",
+    "qunit-ava-spec": "^1.0.0",
+    "rimraf": "^2.6.0",
+    "typescript": "^3.0.3",
+    "typescript-transform-export-interop": "^1.0.0",
+    "webpack": "^4.30.0"
+  }
+}

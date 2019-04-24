@@ -1,0 +1,96 @@
+
+/* IMPORT */
+
+const {Shortcut, Shortcuts} = require ( '../dist' );
+
+/* HELPERS */
+
+const log = document.getElementById ( 'log' );
+
+function scrollBottom () {
+  document.body.scrollTop = Number.MAX_SAFE_INTEGER;
+}
+
+function logHandler ( id, event, result ) {
+  const handledEmoji = !result ? '✅' : '❌';
+  const type = event.type === 'keydown' ? 'keydown ' : 'keypress';
+  const shortcuts = id.map ( ( _, index ) => Shortcut.id2accelerator ( id.slice ( index ) ) );
+  log.innerHTML += `<pre>${handledEmoji} - ${type} - ${shortcuts.map ( s => `<kbd>${s}</kbd>` ).join ( ', ' )}</pre>`;
+  scrollBottom ();
+}
+
+function logHandled ( shortcut ) {
+  setTimeout ( () => { // Hacky way to run this after `logHandler`
+    log.innerHTML += `<pre>   → <kbd>${shortcut}</kbd></pre>`;
+    scrollBottom ();
+  });
+  return true;
+}
+
+function logRecorded ( shortcut ) {
+  log.innerHTML += `<pre>⏺ - record  - <kbd>${shortcut}</kbd></pre>`;
+  scrollBottom ();
+}
+
+function logClear () {
+  log.innerHTML = '';
+}
+
+function patch ( shortcuts ) {
+  const _handler = shortcuts.listener.options.handler
+  shortcuts.listener.options.handler = function ( id, event ) {
+    const result = _handler.call ( this, id, event );
+    if ( !shortcuts.recordHandler ) {
+      logHandler ( id, event, result );
+    }
+    return result;
+  };
+}
+
+/* INIT */
+
+const shortcuts = new Shortcuts ();
+
+patch ( shortcuts ); // For logging purposes
+
+shortcuts.add ([
+  { shortcut: 'A', handler: () => logHandled ( 'A' ) },
+  // { shortcut: 'S', handler: () => logHandled ( 'S' ) },
+  // { shortcut: 'CmdOrCtrl+K A', handler: () => logHandled ( 'CmdOrCtrl+A' ) },
+  { shortcut: 'Ctrl+A', handler: () => logHandled ( 'Ctrl+A' ) },
+  { shortcut: 'Alt+B', handler: () => logHandled ( 'Alt+B' ) },
+  { shortcut: 'Shift+C', handler: () => logHandled ( 'Shift+C' ) },
+  { shortcut: 'Shift+4', handler: () => logHandled ( 'Shift+4' ) },
+  { shortcut: 'Shift+%', handler: () => logHandled ( 'Shift+%' ) },
+  { shortcut: 'Cmd+D', handler: () => logHandled ( 'Cmd+D' ) },
+  { shortcut: 'Cmd+E', handler: () => logHandled ( 'Cmd+E' ) },
+  { shortcut: 'Cmd+E', handler: () => logHandled ( 'Cmd+E (Second)' ) },
+  { shortcut: 'Cmd+J', handler: () => logHandled ( 'Cmd+J' ) },
+  { shortcut: 'Cmd+L', handler: () => logHandled ( 'Cmd+L' ) },
+  { shortcut: '-Cmd+L' },
+  { shortcut: 'Cmd+Backspace', handler: () => logHandled ( 'Cmd+Backspace' ) },
+  { shortcut: 'Cmd+Esc', handler: () => logHandled ( 'Cmd+Esc' ) },
+  { shortcut: 'Cmd+Alt+Shift+Control+F', handler: () => logHandled ( 'Cmd+Alt+Shift+Control+F' ) },
+  { shortcut: 'CmdOrCtrl+K Shift+%', handler: () => logHandled ( 'CmdOrCtrl+K Shift+%' ) },
+  { shortcut: 'CmdOrCtrl+B Shift+^ CmdOrCtrl+B Shift+^', handler: () => logHandled ( 'CmdOrCtrl+B Shift+% CmdOrCtrl+B Shift+%' ) },
+  { shortcut: 'CmdOrCtrl+K CmdOrCtrl+K', handler: () => { logClear (); return logHandled ( `CmdOrCtrl+K CmdOrCtrl+K` ); } },
+  { shortcut: 'Up Right Down Left', handler: () => logHandled ( 'Up Right Down Left' ) },
+  // { shortcut: 'Right Down', handler: () => logHandled ( 'Right Down' ) }
+]);
+
+shortcuts.remove ([
+  { shortcut: 'Cmd+J' }
+]);
+
+/* RECORD */
+
+let recordDispose;
+
+window.record = () => {
+  window.unrecord ();
+  recordDispose = shortcuts.record ( logRecorded );
+};
+
+window.unrecord = () => {
+  if ( recordDispose ) recordDispose ();
+};
