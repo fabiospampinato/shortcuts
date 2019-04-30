@@ -222,7 +222,7 @@ const Consts = {
     0b1000_00000000: 'Shift',
     /* SPECIAL CHARACTERS */
     1: 'Backspace',
-    2: 'CapsLock',
+    2: 'Capslock',
     3: 'Delete',
     4: 'Down',
     5: 'End',
