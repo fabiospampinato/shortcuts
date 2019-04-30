@@ -334,16 +334,16 @@ const Consts = {
     107: 'F23',
     108: 'F24',
     /* NUMPAD DIGITS */
-    109: 'Numpad0',
-    110: 'Numpad1',
-    111: 'Numpad2',
-    112: 'Numpad3',
-    113: 'Numpad4',
-    114: 'Numpad5',
-    115: 'Numpad6',
-    116: 'Numpad7',
-    117: 'Numpad8',
-    118: 'Numpad9'
+    109: 'num0',
+    110: 'num1',
+    111: 'num2',
+    112: 'num3',
+    113: 'num4',
+    114: 'num5',
+    115: 'num6',
+    116: 'num7',
+    117: 'num8',
+    118: 'num9'
   },
 
   id2symbol: { // Map of id numbers to their symbol representation
