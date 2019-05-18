@@ -28,10 +28,9 @@ const Utils = {
 
   triggerShortcutEvent ( shortcut, type ) {
 
-    const id = Shortcut.shortcut2id ( shortcut ),
-          ids = typeof id === 'number' ? [id] : id;
+    const id = Shortcut.shortcut2id ( shortcut );
 
-    ids.forEach ( id => {
+    id.forEach ( id => {
 
       const trigger = Shortcut.getTriggerKey ( id ),
             {ctrl, alt, shift, cmd} = Consts.key2id;
@@ -39,8 +38,8 @@ const Utils = {
       const event = new KeyboardEvent ( type, {
         bubbles: true,
         cancelable: true,
-        key: Shortcut.id2accelerator ( trigger ),
-        keyCode: Shortcut.id2accelerator ( trigger ).charCodeAt ( 0 ),
+        key: Shortcut.id2accelerator ( [trigger] ),
+        keyCode: Shortcut.id2accelerator ( [trigger] ).charCodeAt ( 0 ),
         ctrlKey: !!( ctrl & id ),
         altKey: !!( alt & id ),
         shiftKey: !!( shift & id ),

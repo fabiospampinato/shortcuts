@@ -53,11 +53,9 @@ describe ( 'Shortcut', () => {
 
     it ( 'supports basic single-key shortcuts', t => {
 
-      Object.values ( Consts.key2id ).forEach ( id => {
+      Object.entries ( Consts.id2shortcut ).forEach ( ([ id, shortcut ]) => {
 
-        const shortcut = Consts.id2accelerator[id];
-
-        t.is ( Shortcut.shortcut2accelerator ( shortcut ), shortcut );
+        t.is ( Shortcut.shortcut2accelerator ( shortcut ), Consts.id2accelerator[id] );
 
       });
 
@@ -65,13 +63,13 @@ describe ( 'Shortcut', () => {
 
     it ( 'supports basic multi-key shortcuts', t => {
 
-      Object.values ( Consts.key2id ).forEach ( id => {
+      Object.entries ( Consts.id2accelerator ).forEach ( ([ id, accelerator ]) => {
 
         if ( !Shortcut.getTriggerKey ( id ) ) return;
 
-        const shortcut = `Ctrl+${Consts.id2accelerator[id]}`;
+        const shortcut = `Ctrl+${Consts.id2shortcut[id]}`;
 
-        t.is ( Shortcut.shortcut2accelerator ( shortcut ), shortcut );
+        t.is ( Shortcut.shortcut2accelerator ( shortcut ), `Ctrl+${accelerator}` );
 
       });
 
@@ -79,17 +77,17 @@ describe ( 'Shortcut', () => {
 
     it ( 'supports basic chord shortcuts', t => {
 
-      Object.values ( Consts.key2id ).forEach ( id => {
+      Object.entries ( Consts.id2accelerator ).forEach ( ([ id, accelerator ]) => {
 
-        const shortcutSingle = `Ctrl+K ${Consts.id2accelerator[id]}`;
+        const shortcutSingle = `Ctrl+K ${Consts.id2shortcut[id]}`;
 
-        t.is ( Shortcut.shortcut2accelerator ( shortcutSingle ), shortcutSingle );
+        t.is ( Shortcut.shortcut2accelerator ( shortcutSingle ), `Ctrl+K ${accelerator}` );
 
         if ( Shortcut.getTriggerKey ( id ) ) {
 
-          const shortcutMulti = `Ctrl+K Ctrl+${Consts.id2accelerator[id]}`;
+          const shortcutMulti = `Ctrl+K Ctrl+${Consts.id2shortcut[id]}`;
 
-          t.is ( Shortcut.shortcut2accelerator ( shortcutMulti ), shortcutMulti );
+          t.is ( Shortcut.shortcut2accelerator ( shortcutMulti ), `Ctrl+K Ctrl+${accelerator}` );
 
         }
 
@@ -108,7 +106,7 @@ describe ( 'Shortcut', () => {
         ['Option+Control+Command', 'Ctrl+Alt+Cmd'],
         ['Ctrl++', 'Ctrl+Plus'],
         ['Ctrl+K Alt+D', 'Ctrl+K Alt+D'],
-        ['Ctrl+K Shift+Numpad0', 'Ctrl+K Shift+Numpad0'],
+        ['Ctrl+K Shift+Numpad0', 'Ctrl+K Shift+num0'],
         ['Ctrl+K Ctrl+K', 'Ctrl+K Ctrl+K']
       ];
 
