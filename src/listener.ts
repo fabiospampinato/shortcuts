@@ -2,6 +2,7 @@
 /* IMPORT */
 
 import {ListenerResult} from './enums';
+import {ShortcutID, ListenerOptions} from './types';
 import Shortcut from './shortcut';
 import Utils from './utils';
 

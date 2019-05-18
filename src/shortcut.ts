@@ -1,6 +1,7 @@
 
 /* IMPORT */
 
+import {Chord, ChordID, Shortcut, ShortcutID} from './types';
 import Consts from './consts';
 import Utils from './utils';
 

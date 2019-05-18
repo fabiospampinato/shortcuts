@@ -30,3 +30,7 @@ type ShortcutDescriptor = {
   handler?: ( event: KeyboardEvent ) => boolean | void,
   shortcut: string
 };
+
+/* EXPORT */
+
+export {Chord, ChordID, Shortcut, ShortcutID, RecordHandler, ListenerOptions, ShortcutsOptions, ShortcutsTree, ShortcutDescriptor};

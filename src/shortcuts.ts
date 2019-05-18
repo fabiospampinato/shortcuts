@@ -2,6 +2,7 @@
 /* IMPORT */
 
 import {ListenerResult} from './enums';
+import {Shortcut as ShortcutType, ShortcutID, RecordHandler, ShortcutsOptions, ShortcutsTree, ShortcutDescriptor} from './types';
 import Listener from './listener';
 import Shortcut from './shortcut';
 
@@ -163,7 +164,7 @@ class Shortcuts {
 
   }
 
-  trigger ( shortcut: Shortcut | ShortcutID ): boolean {
+  trigger ( shortcut: ShortcutType | ShortcutID ): boolean {
 
     const id = typeof shortcut === 'string' ? Shortcut.shortcut2id ( shortcut ) : shortcut;
 
