@@ -44,6 +44,12 @@ const Shortcut = {
 
   },
 
+  event2shortcut: ( event: KeyboardEvent ): Shortcut => {
+
+    return Shortcut.id2shortcut ([ Shortcut.event2id ( event ) ]);
+
+  },
+
   event2accelerator: ( event: KeyboardEvent ): string => {
 
     return Shortcut.id2accelerator ([ Shortcut.event2id ( event ) ]);
@@ -142,6 +148,12 @@ const Shortcut = {
     }).join ( sequenceSeparator );
 
   },
+
+  id2shortcut: Utils.memoize ( ( id: ShortcutID ): string => {
+
+    return Shortcut.id2output ( id, Consts.id2shortcut );
+
+  }, Utils.memoizedShortcutIDResolver ),
 
   id2accelerator: Utils.memoize ( ( id: ShortcutID ): string => {
 
