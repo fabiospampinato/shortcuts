@@ -18,7 +18,8 @@ class Shortcuts {
 
     this.listener = new Listener ({
       handler: this.handler,
-      target: options.target
+      target: options.target,
+      shouldHandleEvent: options.shouldHandleEvent
     });
 
     this.reset ();

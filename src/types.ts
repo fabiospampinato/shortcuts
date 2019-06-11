@@ -7,15 +7,18 @@ type Shortcut = string;
 type ShortcutID = ChordID[];
 
 type RecordHandler = ( shortcut: Shortcut ) => any;
+type ShouldHandleEventFunction = ( event: KeyboardEvent ) => boolean;
 
 type ListenerOptions = {
   handler: ( id: ShortcutID, event: KeyboardEvent ) => import ( './enums' ).ListenerResult | ShortcutID,
-  target?: Node
+  target?: Node,
+  shouldHandleEvent?: ShouldHandleEventFunction
 };
 
 type ShortcutsOptions = {
   shortcuts?: ShortcutDescriptor[],
-  target?: Node
+  target?: Node,
+  shouldHandleEvent?: ShouldHandleEventFunction
 };
 
 type ShortcutsTree = {
@@ -33,4 +36,4 @@ type ShortcutDescriptor = {
 
 /* EXPORT */
 
-export {Chord, ChordID, Shortcut, ShortcutID, RecordHandler, ListenerOptions, ShortcutsOptions, ShortcutsTree, ShortcutDescriptor};
+export {Chord, ChordID, Shortcut, ShortcutID, RecordHandler, ShouldHandleEventFunction, ListenerOptions, ShortcutsOptions, ShortcutsTree, ShortcutDescriptor};

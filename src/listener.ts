@@ -2,7 +2,7 @@
 /* IMPORT */
 
 import {ListenerResult} from './enums';
-import {ShortcutID, ListenerOptions} from './types';
+import {ShouldHandleEventFunction, ShortcutID, ListenerOptions} from './types';
 import Shortcut from './shortcut';
 import Utils from './utils';
 
@@ -12,6 +12,7 @@ class Listener {
 
   private options: ListenerOptions;
   private target: Node;
+  private shouldHandleEvent: ShouldHandleEventFunction;
 
   private currentKeydownShortcutID: ShortcutID = [];
   private currentKeypressShortcutID: ShortcutID = [];
@@ -24,6 +25,7 @@ class Listener {
 
     this.options = options;
     this.target = options.target || document;
+    this.shouldHandleEvent = options.shouldHandleEvent || ( event => !event.defaultPrevented );
 
   }
 
@@ -57,7 +59,7 @@ class Listener {
 
   handler = ( event: KeyboardEvent ) => {
 
-    if ( event.defaultPrevented ) return; // Something else handled this event
+    if ( !this.shouldHandleEvent ( event ) ) return;
 
     const isKeydown = event.type === 'keydown';
 
