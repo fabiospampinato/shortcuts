@@ -43,13 +43,16 @@ The Shortcuts class will be used for adding/removing/resetting/recording shortcu
 
 ```ts
 class Shortcuts {
-  constructor ( options: { shortcuts: ShortcutDescriptor[] } );
+  constructor ( options?: { shortcuts?: ShortcutDescriptor[]: target?: Node } );
   add ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] );
   remove ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] );
   reset ();
   record ( handler: ( shortcut ) => any ): Function;
 }
 ```
+
+- ℹ️ The `shortcuts` option accepts an optional array of shortcuts descriptors. More on this below.
+- ℹ️ The `target` option accepts an optional DOM node, where the keyboard evenr listener will be attached to.
 
 A shortcut descriptor looks like this:
 
