@@ -15,9 +15,11 @@ describe ( 'Shortcuts', () => {
 
       const s = new Shortcuts ();
 
-      s.add ([
+      const descriptors = [
         { shortcut: 'Ctrl+A' }
-      ]);
+      ];
+
+      s.add ( descriptors );
 
       t.is ( getShortcutsNr ( s ), 0 );
       t.is ( res.arguments[0], 'Can\'t add shortcut "Ctrl+A" which has no handler' );
@@ -30,18 +32,26 @@ describe ( 'Shortcuts', () => {
 
       t.is ( getShortcutsNr ( s ), 0 );
 
-      s.add ([
+      const descriptors = [
         { shortcut: 'Ctrl+A', handler: () => {} },
         { shortcut: 'Ctrl+A', handler: () => {} },
         { shortcut: 'Ctrl+B', handler: () => {} },
         { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: () => {} },
         { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: () => {} },
         { shortcut: 'CmdOrCtrl+K Ctrl+B', handler: () => {} }
-      ]);
+      ];
 
-      s.add ({ shortcut: 'Ctrl+C', handler: () => {} });
+      s.add ( descriptors );
+
+      const descriptorsMore = [
+        { shortcut: 'Ctrl+C', handler: () => {} }
+      ];
+
+      s.add ( descriptorsMore[0] );
 
       t.is ( getShortcutsNr ( s ), 7 );
+
+      t.deepEqual ( s.get (), descriptors.concat ( descriptorsMore ) );
 
     });
 
@@ -51,14 +61,18 @@ describe ( 'Shortcuts', () => {
 
       const singleHandler = () => {};
 
-      s.add ([
+      const descriptors = [
         { shortcut: 'Ctrl+A', handler: singleHandler },
         { shortcut: '-Ctrl+A', handler: singleHandler },
         { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: () => {} },
         { shortcut: '-CmdOrCtrl+K Ctrl+A' }
-      ]);
+      ];
+
+      s.add ( descriptors );
 
       t.is ( getShortcutsNr ( s ), 0 );
+
+      t.deepEqual ( s.get (), [] );
 
     });
 
@@ -72,20 +86,30 @@ describe ( 'Shortcuts', () => {
 
       const singleHandler = () => {};
 
-      s.add ([
+      const descriptorsAdd = [
         { shortcut: 'Ctrl+A', handler: singleHandler },
         { shortcut: 'Ctrl+B', handler: singleHandler },
         { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: () => {} }
-      ]);
+      ];
 
-      s.remove ([
+      s.add ( descriptorsAdd );
+
+      const descriptorsRemove = [
         { shortcut: 'Ctrl+A', handler: singleHandler },
         { shortcut: 'Ctrl+B', handler: singleHandler }
-      ]);
+      ];
 
-      s.remove ({ shortcut: 'CmdOrCtrl+K Ctrl+A' });
+      s.remove ( descriptorsRemove );
+
+      const descriptorsRemoveMore = [
+        { shortcut: 'CmdOrCtrl+K Ctrl+A' }
+      ];
+
+      s.remove ( descriptorsRemoveMore[0] );
 
       t.is ( getShortcutsNr ( s ), 0 );
+
+      t.deepEqual ( s.get (), [] );
 
     });
 
@@ -95,17 +119,23 @@ describe ( 'Shortcuts', () => {
 
       const singleHandler = () => {};
 
-      s.add ([
+      const descriptorsAdd = [
         { shortcut: 'Ctrl+A', handler: singleHandler },
         { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: () => {} }
-      ]);
+      ];
 
-      s.remove ([
+      s.add ( descriptorsAdd );
+
+      const descriptorsRemove = [
         { shortcut: '-Ctrl+A', handler: singleHandler },
         { shortcut: '-CmdOrCtrl+K Ctrl+A' }
-      ]);
+      ];
+
+      s.remove ( descriptorsRemove );
 
       t.is ( getShortcutsNr ( s ), 0 );
+
+      t.deepEqual ( s.get (), [] );
 
     });
 
@@ -113,19 +143,25 @@ describe ( 'Shortcuts', () => {
 
       const s = new Shortcuts ();
 
-      s.add ([
+      const descriptorsAdd = [
         { shortcut: 'Ctrl+A', handler: () => {} },
         { shortcut: 'Ctrl+A', handler: () => {} },
         { shortcut: 'Ctrl+A', handler: () => {} }
-      ]);
+      ];
+
+      s.add ( descriptorsAdd );
 
       t.is ( getShortcutsNr ( s ), 3 );
 
-      s.remove ([
+      const descriptorsRemove = [
         { shortcut: 'Ctrl+A' },
-      ]);
+      ];
+
+      s.remove ( descriptorsRemove );
 
       t.is ( getShortcutsNr ( s ), 0 );
+
+      t.deepEqual ( s.get (), [] );
 
     });
 
@@ -137,14 +173,18 @@ describe ( 'Shortcuts', () => {
 
       const s = new Shortcuts ();
 
-      s.add ([
+      const descriptors = [
         { shortcut: 'Ctrl+A', handler: () => {} },
         { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: () => {} }
-      ]);
+      ];
+
+      s.add ( descriptors );
 
       s.reset ();
 
       t.is ( getShortcutsNr ( s ), 0 );
+
+      t.deepEqual ( s.get (), [] );
 
     });
 
@@ -166,7 +206,7 @@ describe ( 'Shortcuts', () => {
 
       const getCalls = () => [res1.calls, res2.calls, res3.calls, res4.calls, res5.calls, res6.calls, res7.calls].join ( '' );
 
-      s.add ([
+      const descriptors = [
         { shortcut: 'Alt+A', handler: fn1 },
         { shortcut: 'Alt+A', handler: fn2 },
         { shortcut: 'Alt+A', handler: fn3 },
@@ -174,7 +214,9 @@ describe ( 'Shortcuts', () => {
         { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: fn5 },
         { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: fn6 },
         { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: fn7 }
-      ]);
+      ];
+
+      s.add ( descriptors );
 
       t.true ( s.trigger ( 'Alt+A' ) );
       t.is ( getCalls (), '0110000' );
@@ -211,7 +253,7 @@ describe ( 'Shortcuts', () => {
 
       const getCalls = () => [res1.calls, res2.calls, res3.calls, res4.calls, res5.calls, res6.calls, res7.calls].join ( '' );
 
-      s.add ([
+      const descriptors = [
         { shortcut: 'Alt+A', handler: fn1 },
         { shortcut: 'Alt+A', handler: fn2 },
         { shortcut: 'Alt+A', handler: fn3 },
@@ -219,7 +261,9 @@ describe ( 'Shortcuts', () => {
         { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: fn5 },
         { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: fn6 },
         { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: fn7 }
-      ]);
+      ];
+
+      s.add ( descriptors );
 
       triggerShortcutEvent ( 'Alt+A', 'keydown' );
       triggerShortcutEvent ( 'Alt+A', 'keypress' );

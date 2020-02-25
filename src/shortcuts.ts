@@ -11,6 +11,7 @@ import Shortcut from './shortcut';
 class Shortcuts {
 
   private listener: Listener;
+  private descriptors: ShortcutDescriptor[]; //TODO: Implement this more efficiently, possibly reusing the ShortcutsTree structure we already have
   private shortcuts: ShortcutsTree;
   private recordHandler: RecordHandler;
 
@@ -42,11 +43,19 @@ class Shortcuts {
 
   }
 
+  get (): ShortcutDescriptor[] {
+
+    return this.descriptors;
+
+  }
+
   add ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] ) {
 
     if ( !( descriptors instanceof Array ) ) return this.add ([ descriptors ]);
 
-    descriptors.forEach ( ({ shortcut, handler }) => {
+    descriptors.forEach ( descriptor => {
+
+      const {shortcut, handler} = descriptor;
 
       if ( shortcut[0] === '-' ) return this.remove ([{ shortcut, handler }]);
 
@@ -55,6 +64,8 @@ class Shortcuts {
       const id = Shortcut.shortcut2id ( shortcut );
 
       // if ( !Shortcut.checkValidID ( id ) ) return; //TODO: Maybe enable this check, sacrificing some performance for some user friendliness
+
+      this.descriptors.push ( descriptor );
 
       const lastIndex = id.length - 1;
 
@@ -93,13 +104,17 @@ class Shortcuts {
 
     if ( !( descriptors instanceof Array ) ) return this.remove ([ descriptors ]);
 
-    descriptors.forEach ( ({ shortcut, handler }) => {
+    descriptors.forEach ( descriptor => {
+
+      let {shortcut, handler} = descriptor;
 
       if ( shortcut[0] === '-' ) shortcut = shortcut.slice ( 1 );
 
       const id = Shortcut.shortcut2id ( shortcut );
 
       // if ( !Shortcut.checkValidID ( id ) ) return; //TODO: Maybe enable this check, sacrificing some performance for some user friendliness
+
+      this.descriptors = this.descriptors.filter ( d => d.shortcut !== shortcut && ( !handler || d.handler !== handler ) );
 
       const lastIndex = id.length - 1;
 
@@ -113,7 +128,7 @@ class Shortcuts {
 
           if ( handler ) {
 
-            child.handlers = child.handlers.filter ( h => h != handler );
+            child.handlers = child.handlers.filter ( h => h !== handler );
 
           } else {
 
@@ -147,6 +162,8 @@ class Shortcuts {
   }
 
   reset () {
+
+    this.descriptors = [];
 
     this.shortcuts = {
       size: 0,

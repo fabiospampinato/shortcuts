@@ -44,6 +44,7 @@ The Shortcuts class will be used for adding/removing/resetting/recording shortcu
 ```ts
 class Shortcuts {
   constructor ( options?: { shortcuts?: ShortcutDescriptor[]: target?: Node, shouldHandleEvent?: event => boolean } );
+  get (): ShortcutDescriptor[];
   add ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] );
   remove ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] );
   reset ();
