@@ -63,9 +63,10 @@ class Listener {
 
     const isKeydown = event.type === 'keydown';
 
+    this.ignoreNextKeypress = false; // Resetting, in case a two keydown events get triggered in a row
+
     if ( !isKeydown && this.ignoreNextKeypress ) { // Ignoring this keypress, already handled on keydown
 
-      this.ignoreNextKeypress = false;
       this.triggeredNextKeypress = true;
 
       return;
