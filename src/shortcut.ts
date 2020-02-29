@@ -29,10 +29,12 @@ const Shortcut = {
 
     /* TRIGGER */
 
-    const code = event.which || event.keyCode,
-          char = String.fromCharCode ( code ).toLowerCase ();
+    const isKeypress = ( event.type === 'keypress' ),
+          code = event.which || event.keyCode,
+          char = String.fromCharCode ( code ).toLowerCase (),
+          key = event.key;
 
-    let id = ( event.type === 'keypress' ? Consts.key2id[char] : 0 ) || Consts.code2id[code] || Consts.key2id[char] || 0;
+    let id = isKeypress ? Consts.key2id[key] || Consts.key2id[char] || 0 : Consts.code2id[code] || Consts.key2id[char] || Consts.key2id[key] || 0;
 
     /* MODIFIERS */
 
