@@ -249,9 +249,10 @@ describe ( 'Shortcuts', () => {
             [fn4, res4] = callSpy ( () => {} ),
             [fn5, res5] = callSpy ( () => {} ),
             [fn6, res6] = callSpy ( () => {} ),
-            [fn7, res7] = callSpy ( () => true );
+            [fn7, res7] = callSpy ( () => true ),
+            [fn8, res8] = callSpy ( () => true );
 
-      const getCalls = () => [res1.calls, res2.calls, res3.calls, res4.calls, res5.calls, res6.calls, res7.calls].join ( '' );
+      const getCalls = () => [res1.calls, res2.calls, res3.calls, res4.calls, res5.calls, res6.calls, res7.calls, res8.calls].join ( '' );
 
       const descriptors = [
         { shortcut: 'Alt+A', handler: fn1 },
@@ -260,7 +261,8 @@ describe ( 'Shortcuts', () => {
         { shortcut: 'Ctrl+B', handler: fn4 },
         { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: fn5 },
         { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: fn6 },
-        { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: fn7 }
+        { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: fn7 },
+        { shortcut: 'CmdOrCtrl+/', handler: fn8 }
       ];
 
       s.add ( descriptors );
@@ -268,27 +270,32 @@ describe ( 'Shortcuts', () => {
       triggerShortcutEvent ( 'Alt+A', 'keydown' );
       triggerShortcutEvent ( 'Alt+A', 'keypress' );
       triggerShortcutEvent ( 'Alt+A', 'keyup' );
-      t.is ( getCalls (), '0110000' );
+      t.is ( getCalls (), '01100000' );
 
       triggerShortcutEvent ( 'Ctrl+B', 'keydown' );
       triggerShortcutEvent ( 'Ctrl+B', 'keypress' );
       triggerShortcutEvent ( 'Ctrl+B', 'keyup' );
-      t.is ( getCalls (), '0111000' );
+      t.is ( getCalls (), '01110000' );
 
       triggerShortcutEvent ( 'Ctrl+C', 'keydown' );
       triggerShortcutEvent ( 'Ctrl+C', 'keypress' );
       triggerShortcutEvent ( 'Ctrl+C', 'keyup' );
-      t.is ( getCalls (), '0111000' );
+      t.is ( getCalls (), '01110000' );
 
       triggerShortcutEvent ( 'CmdOrCtrl+K', 'keydown' );
       triggerShortcutEvent ( 'CmdOrCtrl+K', 'keypress' );
       triggerShortcutEvent ( 'CmdOrCtrl+K', 'keyup' );
-      t.is ( getCalls (), '0111000' );
+      t.is ( getCalls (), '01110000' );
 
       triggerShortcutEvent ( 'CmdOrCtrl+K Ctrl+A', 'keydown' );
       triggerShortcutEvent ( 'CmdOrCtrl+K Ctrl+A', 'keypress' );
       triggerShortcutEvent ( 'CmdOrCtrl+K Ctrl+A', 'keyup' );
-      t.is ( getCalls (), '0111001' );
+      t.is ( getCalls (), '01110010' );
+
+      triggerShortcutEvent ( 'CmdOrCtrl+/', 'keydown' );
+      triggerShortcutEvent ( 'CmdOrCtrl+/', 'keypress' );
+      triggerShortcutEvent ( 'CmdOrCtrl+/', 'keyup' );
+      t.is ( getCalls (), '01110011' );
 
     });
 

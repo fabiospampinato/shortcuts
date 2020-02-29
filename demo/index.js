@@ -56,7 +56,7 @@ patch ( shortcuts ); // For logging purposes
 shortcuts.add ([
   { shortcut: 'A', handler: () => logHandled ( 'A' ) },
   // { shortcut: 'S', handler: () => logHandled ( 'S' ) },
-  // { shortcut: 'CmdOrCtrl+K A', handler: () => logHandled ( 'CmdOrCtrl+A' ) },
+  // { shortcut: 'CmdOrCtrl+K A', handler: () => logHandled ( 'CmdOrCtrl+K A' ) },
   { shortcut: 'Ctrl+A', handler: () => logHandled ( 'Ctrl+A' ) },
   { shortcut: 'Alt+B', handler: () => logHandled ( 'Alt+B' ) },
   { shortcut: 'Shift+C', handler: () => logHandled ( 'Shift+C' ) },
@@ -68,19 +68,58 @@ shortcuts.add ([
   { shortcut: 'Cmd+J', handler: () => logHandled ( 'Cmd+J' ) },
   { shortcut: 'Cmd+L', handler: () => logHandled ( 'Cmd+L' ) },
   { shortcut: '-Cmd+L' },
+  { shortcut: 'Ctrl+Space', handler: () => logHandled ( 'Cmd+Space' ) },
   { shortcut: 'Cmd+Backspace', handler: () => logHandled ( 'Cmd+Backspace' ) },
   { shortcut: 'Cmd+Esc', handler: () => logHandled ( 'Cmd+Esc' ) },
   { shortcut: 'Cmd+Alt+Shift+Control+F', handler: () => logHandled ( 'Cmd+Alt+Shift+Control+F' ) },
   { shortcut: 'CmdOrCtrl+K Shift+%', handler: () => logHandled ( 'CmdOrCtrl+K Shift+%' ) },
-  { shortcut: 'CmdOrCtrl+B Shift+^ CmdOrCtrl+B Shift+^', handler: () => logHandled ( 'CmdOrCtrl+B Shift+% CmdOrCtrl+B Shift+%' ) },
+  { shortcut: 'CmdOrCtrl+B Shift+^ CmdOrCtrl+B Shift+^', handler: () => logHandled ( 'CmdOrCtrl+B Shift+^ CmdOrCtrl+B Shift+^' ) },
   { shortcut: 'CmdOrCtrl+K CmdOrCtrl+K', handler: () => { logClear (); return logHandled ( `CmdOrCtrl+K CmdOrCtrl+K` ); } },
   { shortcut: 'Up Right Down Left', handler: () => logHandled ( 'Up Right Down Left' ) },
   // { shortcut: 'Right Down', handler: () => logHandled ( 'Right Down' ) }
+  { shortcut: 'Alt+/', handler: () => logHandled ( 'Alt+/' ) }
 ]);
 
 shortcuts.remove ([
   { shortcut: 'Cmd+J' }
 ]);
+
+/* MANUAL TESTING */
+
+// Alphabet
+// Digit
+// Punctuation
+// Shift+Alphabet
+// Shift+Digit
+// Shift+Punctuation
+// Ctrl+Alphabet
+// Ctrl+Digit
+// Ctrl+Punctuation
+// Cmd+Alphabet
+// Cmd+Digit
+// Cmd+Punctuation
+// Alt+Alphabet
+// Alt+Digit
+// Alt+Punctuation
+// Ctrl+Shift+Alphabet
+// Ctrl+Shift+Digit
+// Ctrl+Shift+Punctuation
+// Cmd+Shift+Alphabet
+// Cmd+Shift+Digit
+// Cmd+Shift+Punctuation
+// Alt+Shift+Alphabet
+// Alt+Shift+Digit
+// Alt+Shift+Punctuation
+// Ctrl+Alt+Shift+Cmd+Alphabet
+// Ctrl+Alt+Shift+Cmd+Digit
+// Ctrl+Alt+Shift+Cmd+Punctuation
+
+//FIXME: The following shortcuts make keypress misfire for some reason
+// Ctrl+Shift+6 keypress ??
+// Ctrl+Shift+- keypress ??
+// Ctrl+Shift+[ keypress ??
+// Ctrl+Shift+] keypress ??
+// Ctrl+Shift+\ keypress ??
 
 /* RECORD */
 

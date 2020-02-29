@@ -176,6 +176,18 @@ const Consts = {
     32: 14, // space
     9: 15, // tab
     38: 16, // up
+    /* PUNCTUATION */ // Ensuring Shift+Punctuation works more reliably
+    222: 59, // '
+    188: 64, // ,
+    189: 65, // -
+    190: 66, // .
+    191: 67, // /
+    186: 69, // ;
+    187: 71, // =
+    219: 75, // [
+    220: 76, // \
+    221: 77, // ]
+    192: 80, // `
     /* FUNCTION KEYS */
     112: 85, // f1
     113: 86, // f2
