@@ -99,17 +99,17 @@ const Shortcut = {
 
   }),
 
-  shortcut2accelerator: ( shortcut: Shortcut ): string => {
+  shortcut2accelerator: Utils.memoize ( ( shortcut: Shortcut ): string => {
 
     return Shortcut.id2accelerator ( Shortcut.shortcut2id ( shortcut ) );
 
-  },
+  }),
 
-  shortcut2symbols: ( shortcut: Shortcut ): string => {
+  shortcut2symbols: Utils.memoize ( ( shortcut: Shortcut ): string => {
 
     return Shortcut.id2symbols ( Shortcut.shortcut2id ( shortcut ) );
 
-  },
+  }),
 
   /* ID */
 
@@ -156,19 +156,19 @@ const Shortcut = {
 
     return Shortcut.id2output ( id, Consts.id2shortcut );
 
-  }, Utils.memoizedShortcutIDResolver ),
+  }),
 
   id2accelerator: Utils.memoize ( ( id: ShortcutID ): string => {
 
     return Shortcut.id2output ( id, Consts.id2accelerator );
 
-  }, Utils.memoizedShortcutIDResolver ),
+  }),
 
   id2symbols: Utils.memoize ( ( id: ShortcutID ): string => {
 
     return Shortcut.id2output ( id, Consts.id2symbol, '' );
 
-  }, Utils.memoizedShortcutIDResolver )
+  })
 
 };
 

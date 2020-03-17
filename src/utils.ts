@@ -23,23 +23,21 @@ const Utils = {
 
   },
 
-  memoize<T extends Function> ( fn: T, resolver?: Function ) {
+  memoize<T extends Function> ( fn: T ) {
 
     const cache = {};
 
-    return function memoizedFunction () {
+    return function memoizedFunction ( id ) {
 
-      const key = resolver ? resolver.apply ( undefined, arguments ) : arguments[0];
+      const cached = cache[id];
 
-      if ( key in cache ) return cache[key];
+      if ( cached ) return cached;
 
-      return cache[key] = fn.apply ( undefined, arguments );
+      return cache[id] = fn.apply ( undefined, arguments );
 
     } as unknown as T;
 
   },
-
-  memoizedShortcutIDResolver: id => id.toString ()
 
 };
 
