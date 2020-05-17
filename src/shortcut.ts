@@ -9,6 +9,20 @@ import Utils from './utils';
 
 const Shortcut = {
 
+  /* MODIFIER KEY */
+
+  getModifierKey: ( id: ChordID ): ChordID => {
+
+    return Consts.modifierKeyBitmask & id;
+
+  },
+
+  hasModifierKey: ( id: ChordID ): boolean => {
+
+    return !!Shortcut.getModifierKey ( id );
+
+  },
+
   /* TRIGGER KEY */
 
   getTriggerKey: ( id: ChordID ): ChordID => {

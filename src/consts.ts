@@ -622,6 +622,7 @@ const Consts = {
     118: 'Numpad9' // numpad9
   },
 
+  modifierKeyBitmask: 0b11111111_00000000, // Bitmask that includes all modifier keys and none of the triggers
   triggerKeyBitmask: 0b11111111 // Bitmask that includes all trigger keys and none of the modifiers
 
 };
