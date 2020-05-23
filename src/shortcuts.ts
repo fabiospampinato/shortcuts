@@ -114,7 +114,7 @@ class Shortcuts {
 
       // if ( !Shortcut.checkValidID ( id ) ) return; //TODO: Maybe enable this check, sacrificing some performance for some user friendliness
 
-      this.descriptors = this.descriptors.filter ( d => d.shortcut !== shortcut && ( !handler || d.handler !== handler ) );
+      this.descriptors = this.descriptors.filter ( d => d.shortcut !== shortcut && ( !handler || d.handler !== handler ) ); //FIXME: This doesn't quite clean up all descriptors properly
 
       const lastIndex = id.length - 1;
 
