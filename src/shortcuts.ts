@@ -5,6 +5,7 @@ import {ListenerResult} from './enums';
 import {Shortcut as ShortcutType, ShortcutID, RecordHandler, ShortcutsOptions, ShortcutsTree, ShortcutDescriptor} from './types';
 import Listener from './listener';
 import Shortcut from './shortcut';
+import Utils from './utils';
 
 /* SHORTCUTS */
 
@@ -114,7 +115,7 @@ class Shortcuts {
 
       // if ( !Shortcut.checkValidID ( id ) ) return; //TODO: Maybe enable this check, sacrificing some performance for some user friendliness
 
-      this.descriptors = this.descriptors.filter ( d => d.shortcut !== shortcut && ( !handler || d.handler !== handler ) ); //FIXME: This doesn't quite clean up all descriptors properly
+      this.descriptors = this.descriptors.filter ( d => d.shortcut !== shortcut && !Utils.isEqual ( Shortcut.shortcut2id ( d.shortcut ), id ) && ( !handler || d.handler !== handler ) );
 
       const lastIndex = id.length - 1;
 
