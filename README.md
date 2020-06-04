@@ -43,7 +43,7 @@ The Shortcuts class will be used for adding/removing/resetting/recording shortcu
 
 ```ts
 class Shortcuts {
-  constructor ( options?: { shortcuts?: ShortcutDescriptor[]: target?: Node, shouldHandleEvent?: event => boolean } );
+  constructor ( options?: { shortcuts?: ShortcutDescriptor[]: capture?: boolean, target?: Node, shouldHandleEvent?: event => boolean } );
   get (): ShortcutDescriptor[];
   add ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] );
   remove ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] );
@@ -53,6 +53,7 @@ class Shortcuts {
 ```
 
 - ℹ️ The `shortcuts` option accepts an optional array of shortcuts descriptors. More on this below.
+- ℹ️ The `capture` option governs whether events are attached for the capturing phase or for the bubbling phase of the propagation.
 - ℹ️ The `target` option accepts an optional DOM node, where the keyboard evenr listener will be attached to.
 - ℹ️ The `shouldHandleEvent` option accepts an optional function which will be used for determining, for each keyboard event, if it should be handled by this library. By default that function is: `event => !event.defaultPrevented`.
 

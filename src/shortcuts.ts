@@ -19,6 +19,7 @@ class Shortcuts {
   constructor ( options: ShortcutsOptions = {} ) {
 
     this.listener = new Listener ({
+      capture: options.capture,
       handler: this.handler,
       target: options.target,
       shouldHandleEvent: options.shouldHandleEvent

@@ -11,6 +11,7 @@ import Utils from './utils';
 class Listener {
 
   private options: ListenerOptions;
+  private capture: boolean;
   private target: Node;
   private shouldHandleEvent: ShouldHandleEventFunction;
 
@@ -24,6 +25,7 @@ class Listener {
   constructor ( options: ListenerOptions ) {
 
     this.options = options;
+    this.capture = !!options.capture;
     this.target = options.target || document;
     this.shouldHandleEvent = options.shouldHandleEvent || ( event => !event.defaultPrevented );
 
@@ -35,8 +37,8 @@ class Listener {
 
     this.listening = true;
 
-    this.target.addEventListener ( 'keydown', this.handler );
-    this.target.addEventListener ( 'keypress', this.handler );
+    this.target.addEventListener ( 'keydown', this.handler, { capture: this.capture } );
+    this.target.addEventListener ( 'keypress', this.handler, { capture: this.capture } );
 
   }
 
@@ -46,8 +48,8 @@ class Listener {
 
     this.listening = false;
 
-    this.target.removeEventListener ( 'keydown', this.handler );
-    this.target.removeEventListener ( 'keypress', this.handler );
+    this.target.removeEventListener ( 'keydown', this.handler, { capture: this.capture } );
+    this.target.removeEventListener ( 'keypress', this.handler, { capture: this.capture } );
 
   }
 

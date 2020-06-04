@@ -11,14 +11,16 @@ type ShouldHandleEventFunction = ( event: KeyboardEvent ) => boolean;
 
 type ListenerOptions = {
   handler: ( id: ShortcutID, event: KeyboardEvent ) => import ( './enums' ).ListenerResult | ShortcutID,
+  capture?: boolean,
   target?: Node,
   shouldHandleEvent?: ShouldHandleEventFunction
 };
 
 type ShortcutsOptions = {
+  capture?: boolean,
   shortcuts?: ShortcutDescriptor[],
-  target?: Node,
-  shouldHandleEvent?: ShouldHandleEventFunction
+  shouldHandleEvent?: ShouldHandleEventFunction,
+  target?: Node
 };
 
 type ShortcutsTree = {
