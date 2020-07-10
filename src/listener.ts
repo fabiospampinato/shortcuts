@@ -17,6 +17,8 @@ class Listener {
 
   private currentKeydownShortcutID: ShortcutID = [];
   private currentKeypressShortcutID: ShortcutID = [];
+  private currentKeyupShortcutID: ShortcutID = [];
+  private currentEventHasNoTrigger: boolean = true;
   private resetNextKeydownShortcutID: boolean = false;
   private triggeredNextKeypress: boolean = true;
   private ignoreNextKeypress: boolean = false;
@@ -39,6 +41,7 @@ class Listener {
 
     this.target.addEventListener ( 'keydown', this.handler, { capture: this.capture } );
     this.target.addEventListener ( 'keypress', this.handler, { capture: this.capture } );
+    this.target.addEventListener ( 'keyup', this.handler, { capture: this.capture } );
 
   }
 
@@ -50,6 +53,7 @@ class Listener {
 
     this.target.removeEventListener ( 'keydown', this.handler, { capture: this.capture } );
     this.target.removeEventListener ( 'keypress', this.handler, { capture: this.capture } );
+    this.target.removeEventListener ( 'keyup', this.handler, { capture: this.capture } );
 
   }
 
@@ -63,11 +67,18 @@ class Listener {
 
     if ( !this.shouldHandleEvent ( event ) ) return;
 
-    const isKeydown = event.type === 'keydown';
+    const {type} = event,
+          isKeydown = ( type === 'keydown' ),
+          isKeypress = ( type === 'keypress' ),
+          isKeyup = ( type === 'keyup' );
 
-    this.ignoreNextKeypress = false; // Resetting, in case a two keydown events get triggered in a row
+    if ( isKeydown ) { // Resetting, in case two keydown events get triggered in a row
 
-    if ( !isKeydown && this.ignoreNextKeypress ) { // Ignoring this keypress, already handled on keydown
+      this.ignoreNextKeypress = false;
+
+    }
+
+    if ( isKeypress && this.ignoreNextKeypress ) { // Ignoring this keypress, already handled on keydown
 
       this.triggeredNextKeypress = true;
 
@@ -76,11 +87,22 @@ class Listener {
     }
 
     const id = Shortcut.event2id ( event ),
-          triggerKey = Shortcut.getTriggerKey ( id );
+          triggerKey = Shortcut.getTriggerKey ( id ),
+          previousEventHadNoTrigger = this.currentEventHasNoTrigger;
 
-    if ( !triggerKey ) return; // Only chords with a trigger key are considered
+    this.currentEventHasNoTrigger = !triggerKey;
 
-    const shortcutID = isKeydown ? this.currentKeydownShortcutID : this.currentKeypressShortcutID;
+    if ( isKeyup && ( triggerKey || !previousEventHadNoTrigger ) ) { // Keyup only handles no-trigger events, if no other shortcuts with triggers have been triggered before
+
+      this.currentKeyupShortcutID.length = 0;
+
+      return;
+
+    }
+
+    if ( !isKeyup && !triggerKey ) return; // Only keyup handles non-trigger events
+
+    const shortcutID = isKeydown ? this.currentKeydownShortcutID : ( isKeyup ? this.currentKeyupShortcutID : this.currentKeypressShortcutID );
 
     if ( isKeydown && !this.resetNextKeydownShortcutID && !this.triggeredNextKeypress ) { // A chord triggered on keydown didn't get triggered on keypress also, so we copy it over manually
 
@@ -98,7 +120,7 @@ class Listener {
 
     shortcutID.push ( id );
 
-    if ( !isKeydown && Utils.isEqual ( this.currentKeydownShortcutID, shortcutID ) ) { // Avoiding handling keypress for the same detected shortcut in order to maximize performance. Unless the handler for this shortcut has been added between keydown and keypress (weird) this won't be a problem
+    if ( isKeypress && Utils.isEqual ( this.currentKeydownShortcutID, shortcutID ) ) { // Avoiding handling keypress for the same detected shortcut in order to maximize performance. Unless the handler for this shortcut has been added between keydown and keypress (weird) this won't be a problem
 
       if ( this.resetNextKeydownShortcutID ) {
 
@@ -120,15 +142,21 @@ class Listener {
 
       this.currentKeypressShortcutID.length = 0;
 
+      this.currentKeyupShortcutID.length = 0;
+
     } else if ( result === ListenerResult.UNHANDLEABLE ) { // Resetting only the current shortcut
 
       if ( isKeydown ) {
 
         this.resetNextKeydownShortcutID = true;
 
-      } else {
+      } else if ( isKeypress ) {
 
         this.currentKeypressShortcutID.length = 0;
+
+      } else if ( isKeyup ) {
+
+        this.currentKeyupShortcutID.length = 0;
 
       }
 
@@ -138,8 +166,12 @@ class Listener {
 
     }
 
-    this.ignoreNextKeypress = isKeydown && result === ListenerResult.HANDLED;
-    this.triggeredNextKeypress = !isKeydown;
+    if ( !isKeyup ) {
+
+      this.ignoreNextKeypress = isKeydown && result === ListenerResult.HANDLED;
+      this.triggeredNextKeypress = isKeypress;
+
+    }
 
   }
 

@@ -13,9 +13,8 @@ function scrollBottom () {
 
 function logHandler ( id, event, result ) {
   const handledEmoji = !result ? '✅' : '❌';
-  const type = event.type === 'keydown' ? 'keydown ' : 'keypress';
   const shortcuts = id.map ( ( _, index ) => Shortcut.id2accelerator ( id.slice ( index ) ) );
-  log.innerHTML += `<pre>${handledEmoji} - ${type} - ${shortcuts.map ( s => `<kbd>${s}</kbd>` ).join ( ', ' )}</pre>`;
+  log.innerHTML += `<pre>${handledEmoji} - ${event.type} - ${shortcuts.map ( s => `<kbd>${s}</kbd>` ).join ( ', ' )}</pre>`;
   scrollBottom ();
 }
 
@@ -77,7 +76,9 @@ shortcuts.add ([
   { shortcut: 'CmdOrCtrl+K CmdOrCtrl+K', handler: () => { logClear (); return logHandled ( `CmdOrCtrl+K CmdOrCtrl+K` ); } },
   { shortcut: 'Up Right Down Left', handler: () => logHandled ( 'Up Right Down Left' ) },
   // { shortcut: 'Right Down', handler: () => logHandled ( 'Right Down' ) }
-  { shortcut: 'Alt+/', handler: () => logHandled ( 'Alt+/' ) }
+  { shortcut: 'Ctrl Ctrl', handler: () => logHandled ( 'Ctrl Ctrl' ) },
+  { shortcut: 'Alt+/', handler: () => logHandled ( 'Alt+/' ) },
+  { shortcut: 'Alt', handler: () => logHandled ( 'Alt' ) }
 ]);
 
 shortcuts.remove ([
@@ -113,6 +114,7 @@ shortcuts.remove ([
 // Ctrl+Alt+Shift+Cmd+Alphabet
 // Ctrl+Alt+Shift+Cmd+Digit
 // Ctrl+Alt+Shift+Cmd+Punctuation
+// Alt
 
 //FIXME: The following shortcuts make keypress misfire for some reason
 // Ctrl+Shift+6 keypress ??
