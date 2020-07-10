@@ -15,10 +15,10 @@ class Listener {
   private target: Node;
   private shouldHandleEvent: ShouldHandleEventFunction;
 
+  private lastKeydownID: number = -1;
   private currentKeydownShortcutID: ShortcutID = [];
   private currentKeypressShortcutID: ShortcutID = [];
   private currentKeyupShortcutID: ShortcutID = [];
-  private currentEventHasNoTrigger: boolean = true;
   private resetNextKeydownShortcutID: boolean = false;
   private triggeredNextKeypress: boolean = true;
   private ignoreNextKeypress: boolean = false;
@@ -87,12 +87,15 @@ class Listener {
     }
 
     const id = Shortcut.event2id ( event ),
-          triggerKey = Shortcut.getTriggerKey ( id ),
-          previousEventHadNoTrigger = this.currentEventHasNoTrigger;
+          triggerKey = Shortcut.getTriggerKey ( id );
 
-    this.currentEventHasNoTrigger = !triggerKey;
+    if ( isKeydown ) {
 
-    if ( isKeyup && ( triggerKey || !previousEventHadNoTrigger ) ) { // Keyup only handles no-trigger events, if no other shortcuts with triggers have been triggered before
+      this.lastKeydownID = id;
+
+    }
+
+    if ( isKeyup && ( triggerKey || id !== this.lastKeydownID ) ) { // Keyup only handles no-trigger events, if no other shortcuts with triggers have been triggered before, if no other keys havve been registered on keyPress
 
       this.currentKeyupShortcutID.length = 0;
 
