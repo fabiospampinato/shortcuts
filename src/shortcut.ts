@@ -39,14 +39,14 @@ const Shortcut = {
 
   /* EVENT */
 
-  event2id: ( event: KeyboardEvent ): ChordID => {
+  event2id: ( event: MouseEvent | KeyboardEvent ): ChordID => {
 
     /* TRIGGER */
 
     const isKeypress = ( event.type === 'keypress' ),
-          code = event.which || event.keyCode,
+          code = event.which || event['keyCode'] || 0,
           char = String.fromCharCode ( code ).toLowerCase (),
-          key = event.key;
+          key = event['key'];
 
     let id = isKeypress ? Consts.key2id[key] || Consts.key2id[char] || 0 : Consts.code2id[code] || Consts.key2id[char] || Consts.key2id[key] || 0;
 
@@ -61,19 +61,19 @@ const Shortcut = {
 
   },
 
-  event2shortcut: ( event: KeyboardEvent ): Shortcut => {
+  event2shortcut: ( event: MouseEvent | KeyboardEvent ): Shortcut => {
 
     return Shortcut.id2shortcut ([ Shortcut.event2id ( event ) ]);
 
   },
 
-  event2accelerator: ( event: KeyboardEvent ): string => {
+  event2accelerator: ( event: MouseEvent | KeyboardEvent ): string => {
 
     return Shortcut.id2accelerator ([ Shortcut.event2id ( event ) ]);
 
   },
 
-  event2symbols: ( event: KeyboardEvent ): string => {
+  event2symbols: ( event: MouseEvent | KeyboardEvent ): string => {
 
     return Shortcut.id2symbols ([ Shortcut.event2id ( event ) ]);
 
