@@ -107,7 +107,7 @@ const Shortcut = {
 
   shortcut2id: Utils.memoize ( ( shortcut: Shortcut ): ShortcutID => {
 
-    const chords = shortcut.split ( Utils.whitespaceRe );
+    const chords = shortcut.trim ().split ( Utils.whitespaceRe );
 
     return chords.map ( Shortcut.chord2id );
 
