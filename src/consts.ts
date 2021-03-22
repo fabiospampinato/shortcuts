@@ -623,7 +623,8 @@ const Consts = {
   },
 
   modifierKeyBitmask: 0b11111111_00000000, // Bitmask that includes all modifier keys and none of the triggers
-  triggerKeyBitmask: 0b11111111 // Bitmask that includes all trigger keys and none of the modifiers
+  triggerKeyBitmask: 0b11111111, // Bitmask that includes all trigger keys and none of the modifiers
+  shortcutRe: /^\s*?(?:(?:^|\s|\+)(?:alt|option|cmd|command|meta|ctrl|control|shift|cmdorctrl|commandorcontrol|backspace|capslock|del|delete|down|end|enter|return|esc|escape|home|insert|left|pagedown|pageup|right|space|spacebar|tab|up|plus|\d|[a-z]|f(?:\d|1\d|2[0-4])|numpad\d|[!"#$%&'()*+,./:;<=>?@[\]^_`{|}~-]))+\s*$/i // Regex that matches a shortcut
 
 };
 

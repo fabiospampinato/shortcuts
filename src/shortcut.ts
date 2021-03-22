@@ -105,6 +105,22 @@ const Shortcut = {
 
   /* SHORTCUT */
 
+  isValidShortcut: ( shortcut: Shortcut ): boolean => {
+
+    return Consts.shortcutRe.test ( shortcut );
+
+  },
+
+  checkValidShortcut: ( shortcut: Shortcut ): boolean => {
+
+    const isValid = Shortcut.isValidShortcut ( shortcut );
+
+    if ( !isValid ) console.error ( `Invalid shortcut: "${shortcut}"` );
+
+    return isValid;
+
+  },
+
   shortcut2id: Utils.memoize ( ( shortcut: Shortcut ): ShortcutID => {
 
     const chords = shortcut.trim ().split ( Utils.whitespaceRe );
@@ -137,7 +153,7 @@ const Shortcut = {
 
     const isValid = Shortcut.isValidID ( id );
 
-    if ( !isValid ) console.error ( `Invalid shortcut: "${Shortcut.id2accelerator ( id )}"` );;
+    if ( !isValid ) console.error ( `Invalid shortcut: "${Shortcut.id2accelerator ( id )}"` );
 
     return isValid;
 
