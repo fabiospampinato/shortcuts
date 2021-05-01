@@ -33,7 +33,7 @@ class Listener {
 
   }
 
-  on () {
+  on (): void {
 
     if ( this.listening ) return;
 
@@ -45,7 +45,7 @@ class Listener {
 
   }
 
-  off () {
+  off (): void {
 
     if ( !this.listening ) return;
 
@@ -63,7 +63,7 @@ class Listener {
 
   }
 
-  handler = ( event: KeyboardEvent ) => {
+  handler = ( event: KeyboardEvent ): void => {
 
     if ( !this.shouldHandleEvent ( event ) ) return;
 

@@ -14,7 +14,7 @@ class Shortcuts {
   private listener: Listener;
   private descriptors: ShortcutDescriptor[]; //TODO: Implement this more efficiently, possibly reusing the ShortcutsTree structure we already have
   private shortcuts: ShortcutsTree;
-  private recordHandler: RecordHandler;
+  private recordHandler?: RecordHandler;
 
   constructor ( options: ShortcutsOptions = {} ) {
 
@@ -35,7 +35,7 @@ class Shortcuts {
 
   }
 
-  private _updateListener () {
+  private _updateListener (): void {
 
     const shouldListen = !!this.shortcuts.size;
 
@@ -51,7 +51,7 @@ class Shortcuts {
 
   }
 
-  add ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] ) {
+  add ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] ): void {
 
     if ( !( descriptors instanceof Array ) ) return this.add ([ descriptors ]);
 
@@ -114,7 +114,7 @@ class Shortcuts {
 
   }
 
-  remove ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] ) {
+  remove ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] ): void {
 
     if ( !( descriptors instanceof Array ) ) return this.remove ([ descriptors ]);
 
@@ -175,7 +175,7 @@ class Shortcuts {
 
   }
 
-  reset () {
+  reset (): void {
 
     this.descriptors = [];
 
@@ -188,11 +188,15 @@ class Shortcuts {
 
   }
 
-  record ( handler: RecordHandler ): Function {
+  record ( handler: RecordHandler ): Disposer {
 
     this.recordHandler = handler;
 
-    return () => delete this.recordHandler;
+    return () => {
+
+      delete this.recordHandler
+
+    };
 
   }
 
