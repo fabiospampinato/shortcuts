@@ -1,7 +1,7 @@
 {
   "name": "shortcuts",
   "description": "Super performant and feature rich shortcuts management library.",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
