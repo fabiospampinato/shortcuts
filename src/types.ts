@@ -6,6 +6,7 @@ type ChordID = number;
 type Shortcut = string;
 type ShortcutID = ChordID[];
 
+type Disposer = () => void;
 type RecordHandler = ( shortcut: Shortcut ) => any;
 type ShouldHandleEventFunction = ( event: KeyboardEvent ) => boolean;
 
@@ -38,4 +39,4 @@ type ShortcutDescriptor = {
 
 /* EXPORT */
 
-export {Chord, ChordID, Shortcut, ShortcutID, RecordHandler, ShouldHandleEventFunction, ListenerOptions, ShortcutsOptions, ShortcutsTree, ShortcutDescriptor};
+export {Chord, ChordID, Shortcut, ShortcutID, Disposer, RecordHandler, ShouldHandleEventFunction, ListenerOptions, ShortcutsOptions, ShortcutsTree, ShortcutDescriptor};

@@ -2,7 +2,7 @@
 /* IMPORT */
 
 import {ListenerResult} from './enums';
-import {Shortcut as ShortcutType, ShortcutID, RecordHandler, ShortcutsOptions, ShortcutsTree, ShortcutDescriptor} from './types';
+import {Shortcut as ShortcutType, ShortcutID, Disposer, RecordHandler, ShortcutsOptions, ShortcutsTree, ShortcutDescriptor} from './types';
 import Listener from './listener';
 import Shortcut from './shortcut';
 import Utils from './utils';
@@ -99,6 +99,18 @@ class Shortcuts {
     });
 
     this._updateListener ();
+
+  }
+
+  register ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] ): Disposer {
+
+    this.add ( descriptors );
+
+    return () => {
+
+      this.remove ( descriptors );
+
+    };
 
   }
 
