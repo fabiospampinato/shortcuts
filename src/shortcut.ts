@@ -1,11 +1,13 @@
 
 /* IMPORT */
 
-import {Chord, ChordID, Shortcut, ShortcutID} from './types';
-import Consts from './consts';
+import {MODIFIER_KEY_BITMASK, TRIGGER_KEY_BITMASK} from './constants';
+import {PLUSES_RE, WHITESPACE_RE, SHORTCUT_RE} from './constants';
+import {KEY2ID, CODE2ID, ID2SHORTCUT, ID2ACCELERATOR, ID2SYMBOL} from './maps';
 import Utils from './utils';
+import type {Chord, ChordID, Shortcut as ShortcutType, ShortcutID} from './types';
 
-/* SHORTCUT */
+/* MAIN */
 
 const Shortcut = {
 
@@ -13,7 +15,7 @@ const Shortcut = {
 
   getModifierKey: ( id: ChordID ): ChordID => {
 
-    return Consts.modifierKeyBitmask & id;
+    return id & MODIFIER_KEY_BITMASK ;
 
   },
 
@@ -27,7 +29,7 @@ const Shortcut = {
 
   getTriggerKey: ( id: ChordID ): ChordID => {
 
-    return Consts.triggerKeyBitmask & id;
+    return id & TRIGGER_KEY_BITMASK;
 
   },
 
@@ -41,27 +43,33 @@ const Shortcut = {
 
   event2id: ( event: MouseEvent | KeyboardEvent ): ChordID => {
 
+    let id = 0;
+
     /* TRIGGER */
 
-    const isKeypress = ( event.type === 'keypress' ),
-          code = event.which || event['keyCode'] || 0,
-          char = String.fromCharCode ( code ).toLowerCase (),
-          key = event['key'];
+    if ( Utils.isKeyboardEvent ( event ) ) {
 
-    let id = isKeypress ? Consts.key2id[key] || Consts.key2id[char] || 0 : Consts.code2id[code] || Consts.key2id[char] || Consts.key2id[key] || 0;
+      const isKeypress = ( event.type === 'keypress' );
+      const code = event.which || event.keyCode || 0;
+      const char = String.fromCharCode ( code ).toLowerCase ();
+      const key = event.key;
+
+      id = isKeypress ? KEY2ID[key] || KEY2ID[char] || 0 : CODE2ID[code] || KEY2ID[char] || KEY2ID[key] || 0;
+
+    }
 
     /* MODIFIERS */
 
-    if ( event.ctrlKey ) id |= Consts.key2id.ctrl;
-    if ( event.altKey ) id |= Consts.key2id.alt;
-    if ( event.shiftKey ) id |= Consts.key2id.shift;
-    if ( event.metaKey ) id |= Consts.key2id.cmd;
+    if ( event.ctrlKey ) id |= KEY2ID.ctrl;
+    if ( event.altKey ) id |= KEY2ID.alt;
+    if ( event.shiftKey ) id |= KEY2ID.shift;
+    if ( event.metaKey ) id |= KEY2ID.cmd;
 
     return id;
 
   },
 
-  event2shortcut: ( event: MouseEvent | KeyboardEvent ): Shortcut => {
+  event2shortcut: ( event: MouseEvent | KeyboardEvent ): ShortcutType => {
 
     return Shortcut.id2shortcut ([ Shortcut.event2id ( event ) ]);
 
@@ -83,10 +91,12 @@ const Shortcut = {
 
   chord2id: Utils.memoize ( ( chord: Chord ): ChordID => {
 
-    const keys = chord.replace ( Utils.plusesRe, '+Plus' ).toLowerCase ().split ( '+' );
+    const keys = chord.replace ( PLUSES_RE, '+Plus' ).toLowerCase ().split ( '+' );
 
     return keys.reduce ( ( keyCode, key ) => {
-      return keyCode | ( Consts.key2id[key] || 0 );
+
+      return keyCode | ( KEY2ID[key] || 0 );
+
     }, 0 );
 
   }),
@@ -105,13 +115,13 @@ const Shortcut = {
 
   /* SHORTCUT */
 
-  isValidShortcut: ( shortcut: Shortcut ): boolean => {
+  isValidShortcut: ( shortcut: ShortcutType ): boolean => {
 
-    return Consts.shortcutRe.test ( shortcut );
+    return SHORTCUT_RE.test ( shortcut );
 
   },
 
-  checkValidShortcut: ( shortcut: Shortcut ): boolean => {
+  checkValidShortcut: ( shortcut: ShortcutType ): boolean => {
 
     const isValid = Shortcut.isValidShortcut ( shortcut );
 
@@ -121,21 +131,21 @@ const Shortcut = {
 
   },
 
-  shortcut2id: Utils.memoize ( ( shortcut: Shortcut ): ShortcutID => {
+  shortcut2id: Utils.memoize ( ( shortcut: ShortcutType ): ShortcutID => {
 
-    const chords = shortcut.trim ().split ( Utils.whitespaceRe );
+    const chords = shortcut.trim ().split ( WHITESPACE_RE );
 
     return chords.map ( Shortcut.chord2id );
 
   }),
 
-  shortcut2accelerator: Utils.memoize ( ( shortcut: Shortcut ): string => {
+  shortcut2accelerator: Utils.memoize ( ( shortcut: ShortcutType ): string => {
 
     return Shortcut.id2accelerator ( Shortcut.shortcut2id ( shortcut ) );
 
   }),
 
-  shortcut2symbols: Utils.memoize ( ( shortcut: Shortcut ): string => {
+  shortcut2symbols: Utils.memoize ( ( shortcut: ShortcutType ): string => {
 
     return Shortcut.id2symbols ( Shortcut.shortcut2id ( shortcut ) );
 
@@ -145,7 +155,7 @@ const Shortcut = {
 
   isValidID: ( id: ShortcutID ): boolean => {
 
-    return id.find ( id => !id ) === undefined;
+    return id.every ( Utils.isTruthy );
 
   },
 
@@ -159,22 +169,22 @@ const Shortcut = {
 
   },
 
-  id2output: ( id: ShortcutID, outputMap = {}, chordSeparator = '+', sequenceSeparator = ' ' ): string => {
+  id2output: ( id: ShortcutID, idMap: Record<number, string>, chordSeparator: string, sequenceSeparator: string ): string => {
 
-    const {ctrl, alt, shift, cmd} = Consts.key2id;
+    const {ctrl, alt, shift, cmd} = KEY2ID;
 
     return id.map ( id => {
 
       const keys: string[] = [];
 
-      if ( ctrl & id ) keys.push ( outputMap[ctrl] );
-      if ( alt & id ) keys.push ( outputMap[alt] );
-      if ( shift & id ) keys.push ( outputMap[shift] );
-      if ( cmd & id ) keys.push ( outputMap[cmd] );
+      if ( id & ctrl ) keys.push ( idMap[ctrl] );
+      if ( id & alt ) keys.push ( idMap[alt] );
+      if ( id & shift ) keys.push ( idMap[shift] );
+      if ( id & cmd ) keys.push ( idMap[cmd] );
 
       const triggerKey = Shortcut.getTriggerKey ( id );
 
-      if ( triggerKey ) keys.push ( outputMap[triggerKey] || String.fromCharCode ( triggerKey ).toUpperCase () );
+      if ( triggerKey ) keys.push ( idMap[triggerKey] || String.fromCharCode ( triggerKey ).toUpperCase () );
 
       return keys.join ( chordSeparator );
 
@@ -182,23 +192,23 @@ const Shortcut = {
 
   },
 
-  id2shortcut: Utils.memoize ( ( id: ShortcutID ): string => {
+  id2shortcut: ( id: ShortcutID ): string => {
 
-    return Shortcut.id2output ( id, Consts.id2shortcut );
+    return Shortcut.id2output ( id, ID2SHORTCUT, '+', ' ' );
 
-  }),
+  },
 
-  id2accelerator: Utils.memoize ( ( id: ShortcutID ): string => {
+  id2accelerator: ( id: ShortcutID ): string => {
 
-    return Shortcut.id2output ( id, Consts.id2accelerator );
+    return Shortcut.id2output ( id, ID2ACCELERATOR, '+', ' ' );
 
-  }),
+  },
 
-  id2symbols: Utils.memoize ( ( id: ShortcutID ): string => {
+  id2symbols: ( id: ShortcutID ): string => {
 
-    return Shortcut.id2output ( id, Consts.id2symbol, '' );
+    return Shortcut.id2output ( id, ID2SYMBOL, '', ' ' );
 
-  })
+  }
 
 };
 

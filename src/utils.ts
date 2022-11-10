@@ -1,21 +1,23 @@
 
-/* UTILS */
+/* MAIN */
 
 const Utils = {
 
-  plusesRe: /\+{2,}/gi,
+  /* API */
 
-  whitespaceRe: /\s+/gi,
+  isArray: ( value: unknown ): value is unknown[] => {
 
-  isMac: /mac|ipod|iphone|ipad/i.test ( navigator.platform ),
+    return Array.isArray ( value );
 
-  isEqual ( x: any[], y: any[] ): boolean {
+  },
 
-    if ( x.length !== y.length ) return false;
+  isEqual: ( a: number[], b: number[] ): boolean => {
 
-    for ( let i = 0, l = x.length; i < l; i++ ) {
+    if ( a.length !== b.length ) return false;
 
-      if ( x[i] !== y[i] ) return false;
+    for ( let i = 0, l = a.length; i < l; i++ ) {
+
+      if ( a[i] !== b[i] ) return false;
 
     }
 
@@ -23,21 +25,49 @@ const Utils = {
 
   },
 
-  memoize<T extends Function> ( fn: T ) {
+  isFalsy: ( value: unknown ): boolean => {
 
-    const cache = {};
+    return !value;
+  },
 
-    return function memoizedFunction ( id ) {
+  isKeyboardEvent: ( event: Event ): event is KeyboardEvent => {
 
-      const cached = cache[id];
-
-      if ( cached ) return cached;
-
-      return cache[id] = fn.apply ( undefined, arguments );
-
-    } as unknown as T;
+    return event.type.startsWith ( 'key' );
 
   },
+
+  isMac: (): boolean => {
+
+    if ( typeof navigator !== 'object' ) return false;
+
+    return /mac|ipod|iphone|ipad/i.test ( navigator.platform );
+
+  },
+
+  isTruthy: ( value: unknown ): boolean => {
+
+    return !!value;
+  },
+
+  memoize: <T, R> ( fn: (( arg: T ) => R) ): (( arg: T ) => R) => {
+
+    const cache = new Map<T, R> ();
+
+    return ( arg: T ): R => {
+
+      const cached = cache.get ( arg );
+
+      if ( cached || cache.has ( arg ) ) return cached as R; //TSC
+
+      const result = fn ( arg );
+
+      cache.set ( arg, result );
+
+      return result;
+
+    };
+
+  }
 
 };
 

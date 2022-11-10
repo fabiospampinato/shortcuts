@@ -1,57 +1,83 @@
 
-const Consts = require ( '../dist/consts' ).default;
-const {Shortcut} = require ( '../dist' );
+/* IMPORT */
 
-const Utils = {
+import {EventEmitter} from 'node:events';
+import {KEY2ID} from '../dist/maps.js';
+import {Shortcut} from '../dist/index.js';
 
-  getShortcutsNr ( Shortcuts ) {
+/* MAIN */
 
-    function getNr ( target ) {
+const Emitter = (() => {
 
-      let nr = target.handlers.length;
+  const emitter = new EventEmitter ();
 
-      Object.keys ( target ).map ( key => {
-
-        if ( Number ( key ) != key ) return;
-
-        if ( target[key].handlers ) nr += getNr ( target[key] );
-
-      });
-
-      return nr;
-
+  return {
+    addEventListener: ( name, listener ) => {
+      emitter.addListener ( name, listener );
+    },
+    removeEventListener: ( name, listener ) => {
+      emitter.removeListener ( name, listener );
+    },
+    dispatchEvent: ( event ) => {
+      emitter.emit ( event.type, event );
     }
+  };
 
-    return getNr ( Shortcuts.shortcuts );
+})();
 
-  },
+const getShortcutsNr = ( Shortcuts ) => {
 
-  triggerShortcutEvent ( shortcut, type ) {
+  const getNr = ( target ) => {
 
-    const id = Shortcut.shortcut2id ( shortcut );
+    let nr = target.handlers.length;
 
-    id.forEach ( id => {
+    Object.keys ( target ).map ( key => {
 
-      const trigger = Shortcut.getTriggerKey ( id ),
-            {ctrl, alt, shift, cmd} = Consts.key2id;
+      if ( Number ( key ) != key ) return;
 
-      const event = new KeyboardEvent ( type, {
-        bubbles: true,
-        cancelable: true,
-        key: Shortcut.id2accelerator ( [trigger] ),
-        keyCode: Shortcut.id2accelerator ( [trigger] ).charCodeAt ( 0 ),
-        ctrlKey: !!( ctrl & id ),
-        altKey: !!( alt & id ),
-        shiftKey: !!( shift & id ),
-        metaKey: !!( cmd & id )
-      });
+      if ( !target[key].handlers ) return;
 
-      document.dispatchEvent ( event );
+      nr += getNr ( target[key] );
 
     });
 
+    return nr;
+
   }
+
+  return getNr ( Shortcuts.shortcuts );
 
 };
 
-module.exports = Utils;
+const triggerShortcutEvent = ( shortcut, type ) => {
+
+  const id = Shortcut.shortcut2id ( shortcut );
+
+  id.forEach ( id => {
+
+    const trigger = Shortcut.getTriggerKey ( id );
+    const {ctrl, alt, shift, cmd} = KEY2ID;
+
+    const event = {
+      type,
+      bubbles: true,
+      cancelable: true,
+      key: Shortcut.id2accelerator ( [trigger] ),
+      keyCode: Shortcut.id2accelerator ( [trigger] ).charCodeAt ( 0 ),
+      ctrlKey: !!( ctrl & id ),
+      altKey: !!( alt & id ),
+      shiftKey: !!( shift & id ),
+      metaKey: !!( cmd & id ),
+      preventDefault: () => {},
+      stopPropagation: () => {}
+    };
+
+    Emitter.dispatchEvent ( event );
+
+  });
+
+};
+
+/* EXPORT */
+
+export {Emitter, getShortcutsNr, triggerShortcutEvent};

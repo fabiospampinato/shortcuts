@@ -1,20 +1,24 @@
 
 /* IMPORT */
 
-import {ListenerResult} from './enums';
-import {Shortcut as ShortcutType, ShortcutID, Disposer, RecordHandler, ShortcutsOptions, ShortcutsTree, ShortcutDescriptor} from './types';
+import {RESULT} from './constants';
 import Listener from './listener';
 import Shortcut from './shortcut';
 import Utils from './utils';
+import type {Shortcut as ShortcutType, ShortcutID, Disposer, RecordHandler, ShortcutsOptions, ShortcutsTree, ShortcutDescriptor} from './types';
 
-/* SHORTCUTS */
+/* MAIN */
 
 class Shortcuts {
 
+  /* VARIABLES */
+
   private listener: Listener;
-  private descriptors: ShortcutDescriptor[]; //TODO: Implement this more efficiently, possibly reusing the ShortcutsTree structure we already have
-  private shortcuts: ShortcutsTree;
+  private descriptors: ShortcutDescriptor[] = []; //TODO: Implement this more efficiently, possibly reusing the ShortcutsTree structure we already have
+  private shortcuts: ShortcutsTree = { size: 0, handlers: [] };
   private recordHandler?: RecordHandler;
+
+  /* CONSTRUCTOR */
 
   constructor ( options: ShortcutsOptions = {} ) {
 
@@ -35,7 +39,9 @@ class Shortcuts {
 
   }
 
-  private _updateListener (): void {
+  /* PRIVATE API */
+
+  private _updateListener = (): void => {
 
     const shouldListen = !!this.shortcuts.size;
 
@@ -43,17 +49,88 @@ class Shortcuts {
 
     shouldListen ? this.listener.on () : this.listener.off ();
 
-  }
+  };
 
-  get (): ShortcutDescriptor[] {
+  private handler = ( id: ShortcutID, event?: KeyboardEvent ): 0 | 1 | 2 | ShortcutID => {
+
+    if ( this.recordHandler ) { // Recording
+
+      this.recordHandler ( Shortcut.id2accelerator ( id ) );
+
+      return RESULT.UNHANDLED;
+
+    }
+
+    let handleable = false;
+    let firstHandleableIndex = -1;
+
+    outer:
+    for ( let i = 0, l = id.length; i < l; i++ ) { // Trying all possible combinations (e.g 'A B C' => ['A B C', 'B C ', 'C'])
+
+      let target = this.shortcuts;
+
+      for ( let ci = i; ci < l; ci++ ) { // Getting all chords in the current combination
+
+        target = target[id[ci]];
+
+        if ( !target ) {
+
+          if ( !handleable && i === ( l - 1 ) ) return RESULT.UNHANDLEABLE; // Can't be handled by any deeper shortcuts
+
+          continue outer;
+
+        }
+
+      }
+
+      handleable = true;
+
+      if ( firstHandleableIndex === -1 ) firstHandleableIndex = i;
+
+      const {handlers} = target;
+
+      for ( let hi = 0, hl = handlers.length; hi < hl; hi++ ) {
+
+        if ( handlers[hi]( event ) === true ) { // Handled, stopping here
+
+          if ( event ) {
+
+            event.preventDefault ();
+            event.stopPropagation ();
+
+          }
+
+          return RESULT.HANDLED;
+
+        }
+
+      }
+
+    }
+
+    if ( firstHandleableIndex > 0 ) { // Simplifying the shortcut, no point in checking unhandleable combinations
+
+      return id.slice ( firstHandleableIndex );
+
+    } else {
+
+      return RESULT.UNHANDLED;
+
+    }
+
+  };
+
+  /* PUBLIC API */
+
+  get = (): ShortcutDescriptor[] => {
 
     return this.descriptors;
 
-  }
+  };
 
-  add ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] ): void {
+  add = ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] ): void => {
 
-    if ( !( descriptors instanceof Array ) ) return this.add ([ descriptors ]);
+    if ( !Utils.isArray ( descriptors ) ) return this.add ([ descriptors ]);
 
     descriptors.forEach ( descriptor => {
 
@@ -61,7 +138,7 @@ class Shortcuts {
 
       if ( shortcut[0] === '-' ) return this.remove ([{ shortcut, handler }]);
 
-      if ( !handler ) return console.error ( `Can\'t add shortcut "${shortcut}" which has no handler` );
+      if ( !handler ) return console.error ( `Can't add shortcut "${shortcut}" which has no handler` );
 
       const id = Shortcut.shortcut2id ( shortcut );
 
@@ -100,9 +177,9 @@ class Shortcuts {
 
     this._updateListener ();
 
-  }
+  };
 
-  register ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] ): Disposer {
+  register = ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] ): Disposer => {
 
     this.add ( descriptors );
 
@@ -112,11 +189,11 @@ class Shortcuts {
 
     };
 
-  }
+  };
 
-  remove ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] ): void {
+  remove = ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] ): void => {
 
-    if ( !( descriptors instanceof Array ) ) return this.remove ([ descriptors ]);
+    if ( !Utils.isArray ( descriptors ) ) return this.remove ([ descriptors ]);
 
     descriptors.forEach ( descriptor => {
 
@@ -132,7 +209,7 @@ class Shortcuts {
 
       const lastIndex = id.length - 1;
 
-      id.reduce ( ( parent: ShortcutsTree, id, index ) => {
+      id.reduce ( ( parent, id, index ) => {
 
         const child = parent[id];
 
@@ -168,14 +245,13 @@ class Shortcuts {
 
       }, this.shortcuts );
 
-
     });
 
     this._updateListener ();
 
-  }
+  };
 
-  reset (): void {
+  reset = (): void => {
 
     this.descriptors = [];
 
@@ -186,9 +262,9 @@ class Shortcuts {
 
     this._updateListener ();
 
-  }
+  };
 
-  record ( handler: RecordHandler ): Disposer {
+  record = ( handler: RecordHandler ): Disposer => {
 
     this.recordHandler = handler;
 
@@ -198,80 +274,17 @@ class Shortcuts {
 
     };
 
-  }
+  };
 
-  trigger ( shortcut: ShortcutType | ShortcutID ): boolean {
+  trigger = ( shortcut: ShortcutType | ShortcutID ): boolean => {
 
     const id = typeof shortcut === 'string' ? Shortcut.shortcut2id ( shortcut ) : shortcut;
 
-    // if ( !Shortcut.checkValidID ( id ) ) return ListenerResult.UNHANDLEABLE; //TODO: Maybe enable this check, sacrificing some performance for some user friendliness
+    // if ( !Shortcut.checkValidID ( id ) ) return RESULT.UNHANDLEABLE; //TODO: Maybe enable this check, sacrificing some performance for some user friendliness
 
-    return this.handler ( id ) === ListenerResult.HANDLED;
+    return this.handler ( id ) === RESULT.HANDLED;
 
-  }
-
-  private handler = ( id: ShortcutID, event?: KeyboardEvent ): ListenerResult | ShortcutID => {
-
-    if ( this.recordHandler ) { // Recording
-
-      this.recordHandler ( Shortcut.id2accelerator ( id ) );
-
-      return ListenerResult.UNHANDLED;
-
-    }
-
-    let handleable = false,
-        firstHandleableIndex = -1;
-
-    outer:
-    for ( let i = 0, l = id.length; i < l; i++ ) { // Trying all possible combinations (e.g 'A B C' => ['A B C', 'B C ', 'C'])
-
-      let target = this.shortcuts;
-
-      for ( let ci = i; ci < l; ci++ ) { // Getting all chords in the current combination
-
-        target = target[id[ci]];
-
-        if ( !target ) {
-
-          if ( !handleable && i === ( l - 1 ) ) return ListenerResult.UNHANDLEABLE; // Can't be handled by any deeper shortcuts
-
-          continue outer;
-
-        }
-
-      }
-
-      handleable = true;
-
-      if ( firstHandleableIndex === -1 ) firstHandleableIndex = i;
-
-      const {handlers} = target;
-
-      for ( let hi = 0, hl = handlers.length; hi < hl; hi++ ) {
-
-        if ( handlers[hi]( event ) === true ) { // Handled, stopping here
-
-          if ( event ) {
-
-            event.preventDefault ();
-            event.stopPropagation ();
-
-          }
-
-          return ListenerResult.HANDLED;
-
-        }
-
-      }
-
-    }
-
-    if ( firstHandleableIndex > 0 ) return id.slice ( firstHandleableIndex ); // Simplifying the shortcut, no point in checking unhandleable combinations
-
-    return ListenerResult.UNHANDLED;
-
-  }
+  };
 
 }
 

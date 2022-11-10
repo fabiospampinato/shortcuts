@@ -1,5 +1,5 @@
 
-/* TYPES */
+/* MAIN */
 
 type Chord = string;
 type ChordID = number;
@@ -7,21 +7,21 @@ type Shortcut = string;
 type ShortcutID = ChordID[];
 
 type Disposer = () => void;
-type RecordHandler = ( shortcut: Shortcut ) => any;
+type RecordHandler = ( shortcut: Shortcut ) => void;
 type ShouldHandleEventFunction = ( event: KeyboardEvent ) => boolean;
 
 type ListenerOptions = {
-  handler: ( id: ShortcutID, event: KeyboardEvent ) => import ( './enums' ).ListenerResult | ShortcutID,
   capture?: boolean,
   target?: Node,
+  handler: ( id: ShortcutID, event: KeyboardEvent ) => 0 | 1 | 2 | ShortcutID,
   shouldHandleEvent?: ShouldHandleEventFunction
 };
 
 type ShortcutsOptions = {
   capture?: boolean,
+  target?: Node,
   shortcuts?: ShortcutDescriptor[],
-  shouldHandleEvent?: ShouldHandleEventFunction,
-  target?: Node
+  shouldHandleEvent?: ShouldHandleEventFunction
 };
 
 type ShortcutsTree = {
@@ -39,4 +39,6 @@ type ShortcutDescriptor = {
 
 /* EXPORT */
 
-export {Chord, ChordID, Shortcut, ShortcutID, Disposer, RecordHandler, ShouldHandleEventFunction, ListenerOptions, ShortcutsOptions, ShortcutsTree, ShortcutDescriptor};
+export type {Chord, ChordID, Shortcut, ShortcutID};
+export type {Disposer, RecordHandler, ShouldHandleEventFunction};
+export type {ListenerOptions, ShortcutsOptions, ShortcutsTree, ShortcutDescriptor};

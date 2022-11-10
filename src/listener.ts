@@ -1,14 +1,16 @@
 
 /* IMPORT */
 
-import {ListenerResult} from './enums';
-import {ShouldHandleEventFunction, ShortcutID, ListenerOptions} from './types';
+import {RESULT} from './constants';
 import Shortcut from './shortcut';
 import Utils from './utils';
+import type {ShouldHandleEventFunction, ShortcutID, ListenerOptions} from './types';
 
-/* LISTENER */
+/* MAIN */
 
 class Listener {
+
+  /* VARIABLES */
 
   private options: ListenerOptions;
   private capture: boolean;
@@ -24,6 +26,8 @@ class Listener {
   private ignoreNextKeypress: boolean = false;
   private listening: boolean = false;
 
+  /* CONSTRUCTOR */
+
   constructor ( options: ListenerOptions ) {
 
     this.options = options;
@@ -33,7 +37,9 @@ class Listener {
 
   }
 
-  on (): void {
+  /* API */
+
+  on = (): void => {
 
     if ( this.listening ) return;
 
@@ -43,9 +49,9 @@ class Listener {
     this.target.addEventListener ( 'keypress', this.handler, { capture: this.capture } );
     this.target.addEventListener ( 'keyup', this.handler, { capture: this.capture } );
 
-  }
+  };
 
-  off (): void {
+  off = (): void => {
 
     if ( !this.listening ) return;
 
@@ -55,22 +61,24 @@ class Listener {
     this.target.removeEventListener ( 'keypress', this.handler, { capture: this.capture } );
     this.target.removeEventListener ( 'keyup', this.handler, { capture: this.capture } );
 
-  }
+  };
 
-  isListening (): boolean {
+  isListening = (): boolean => {
 
     return this.listening;
 
-  }
+  };
 
-  handler = ( event: KeyboardEvent ): void => {
+  handler = ( event: Event ): void => {
+
+    if ( !Utils.isKeyboardEvent ( event ) ) return;
 
     if ( !this.shouldHandleEvent ( event ) ) return;
 
-    const {type} = event,
-          isKeydown = ( type === 'keydown' ),
-          isKeypress = ( type === 'keypress' ),
-          isKeyup = ( type === 'keyup' );
+    const {type} = event;
+    const isKeydown = ( type === 'keydown' );
+    const isKeypress = ( type === 'keypress' );
+    const isKeyup = ( type === 'keyup' );
 
     if ( isKeydown ) { // Resetting, in case two keydown events get triggered in a row
 
@@ -86,8 +94,8 @@ class Listener {
 
     }
 
-    const id = Shortcut.event2id ( event ),
-          triggerKey = Shortcut.getTriggerKey ( id );
+    const id = Shortcut.event2id ( event );
+    const triggerKey = Shortcut.getTriggerKey ( id );
 
     if ( isKeydown ) {
 
@@ -139,7 +147,7 @@ class Listener {
 
     const result = this.options.handler ( shortcutID, event );
 
-    if ( result === ListenerResult.HANDLED ) { // Resetting all shortcuts
+    if ( result === RESULT.HANDLED ) { // Resetting all shortcuts
 
       this.resetNextKeydownShortcutID = true;
 
@@ -147,7 +155,7 @@ class Listener {
 
       this.currentKeyupShortcutID.length = 0;
 
-    } else if ( result === ListenerResult.UNHANDLEABLE ) { // Resetting only the current shortcut
+    } else if ( result === RESULT.UNHANDLEABLE ) { // Resetting only the current shortcut
 
       if ( isKeydown ) {
 
@@ -171,12 +179,12 @@ class Listener {
 
     if ( !isKeyup ) {
 
-      this.ignoreNextKeypress = isKeydown && result === ListenerResult.HANDLED;
+      this.ignoreNextKeypress = isKeydown && result === RESULT.HANDLED;
       this.triggeredNextKeypress = isKeypress;
 
     }
 
-  }
+  };
 
 }
 

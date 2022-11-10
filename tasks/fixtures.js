@@ -1,5 +1,5 @@
 
-/* FIXTURES */
+/* MAIN */
 
 const DESCRIPTOR = { shortcut: 'Ctrl+T', handler: () => {} };
 
@@ -14,4 +14,4 @@ const DESCRIPTORS = [
 
 /* EXPORT */
 
-module.exports = {DESCRIPTOR, DESCRIPTORS};
+export {DESCRIPTOR, DESCRIPTORS};

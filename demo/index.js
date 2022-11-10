@@ -1,7 +1,7 @@
 
 /* IMPORT */
 
-const {Shortcut, Shortcuts} = require ( '../dist' );
+import {Shortcut, Shortcuts} from '../dist/index.js';
 
 /* HELPERS */
 

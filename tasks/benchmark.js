@@ -1,19 +1,18 @@
 
 /* IMPORT */
 
-require ( 'jsdom-global/register' );
+import benchmark from 'benchloop';
+import {Shortcut, Shortcuts} from '../dist/index.js';
+import {Emitter} from '../test/utils.js';
+import {DESCRIPTOR, DESCRIPTORS} from './fixtures.js';
 
-const {Shortcut, Shortcuts} = require ( '../dist' ),
-      {DESCRIPTOR, DESCRIPTORS} = require ( './fixtures' ),
-      benchmark = require ( 'benchloop' );
-
-/* BENCHMARK */
+/* MAIN */
 
 benchmark.defaultOptions = Object.assign ( benchmark.defaultOptions, {
   iterations: 50000,
   log: 'compact',
   beforeEach: ctx => {
-    ctx.shortcuts = new Shortcuts ();
+    ctx.shortcuts = new Shortcuts ({ target: Emitter });
     ctx.shortcuts.add ( DESCRIPTORS );
   },
   afterEach: ctx => {

@@ -1,7 +1,12 @@
 
-const callSpy = require ( 'call-spy' );
-const {Shortcut, Shortcuts} = require ( '../../dist' );
-const {getShortcutsNr, triggerShortcutEvent} = require ( '../utils' );
+/* IMPORT */
+
+import callSpy from 'call-spy';
+import {describe} from 'fava';
+import {Shortcut, Shortcuts} from '../dist/index.js';
+import {Emitter, getShortcutsNr, triggerShortcutEvent} from './utils.js';
+
+/* MAIN */
 
 describe ( 'Shortcuts', () => {
 
@@ -13,24 +18,28 @@ describe ( 'Shortcuts', () => {
 
       console.error = fn;
 
-      const s = new Shortcuts ();
+      const shortcuts = new Shortcuts ({
+        target: Emitter
+      });
 
       const descriptors = [
         { shortcut: 'Ctrl+A' }
       ];
 
-      s.add ( descriptors );
+      shortcuts.add ( descriptors );
 
-      t.is ( getShortcutsNr ( s ), 0 );
+      t.is ( getShortcutsNr ( shortcuts ), 0 );
       t.is ( res.arguments[0], 'Can\'t add shortcut "Ctrl+A" which has no handler' );
 
     });
 
     it ( 'can add some shortcuts', t => {
 
-      const s = new Shortcuts ();
+      const shortcuts = new Shortcuts ({
+        target: Emitter
+      });
 
-      t.is ( getShortcutsNr ( s ), 0 );
+      t.is ( getShortcutsNr ( shortcuts ), 0 );
 
       const descriptors = [
         { shortcut: 'Ctrl+A', handler: () => {} },
@@ -41,23 +50,25 @@ describe ( 'Shortcuts', () => {
         { shortcut: 'CmdOrCtrl+K Ctrl+B', handler: () => {} }
       ];
 
-      s.add ( descriptors );
+      shortcuts.add ( descriptors );
 
       const descriptorsMore = [
         { shortcut: 'Ctrl+C', handler: () => {} }
       ];
 
-      s.add ( descriptorsMore[0] );
+      shortcuts.add ( descriptorsMore[0] );
 
-      t.is ( getShortcutsNr ( s ), 7 );
+      t.is ( getShortcutsNr ( shortcuts ), 7 );
 
-      t.deepEqual ( s.get (), descriptors.concat ( descriptorsMore ) );
+      t.deepEqual ( shortcuts.get (), descriptors.concat ( descriptorsMore ) );
 
     });
 
     it ( 'supports removing shortcuts with an hyphen', t => {
 
-      const s = new Shortcuts ();
+      const shortcuts = new Shortcuts ({
+        target: Emitter
+      });
 
       const singleHandler = () => {};
 
@@ -68,11 +79,11 @@ describe ( 'Shortcuts', () => {
         { shortcut: '-CmdOrCtrl+K Ctrl+A' }
       ];
 
-      s.add ( descriptors );
+      shortcuts.add ( descriptors );
 
-      t.is ( getShortcutsNr ( s ), 0 );
+      t.is ( getShortcutsNr ( shortcuts ), 0 );
 
-      t.deepEqual ( s.get (), [] );
+      t.deepEqual ( shortcuts.get (), [] );
 
     });
 
@@ -82,7 +93,9 @@ describe ( 'Shortcuts', () => {
 
     it ( 'can remove some shortcuts', t => {
 
-      const s = new Shortcuts ();
+      const shortcuts = new Shortcuts ({
+        target: Emitter
+      });
 
       const singleHandler = () => {};
 
@@ -92,30 +105,32 @@ describe ( 'Shortcuts', () => {
         { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: () => {} }
       ];
 
-      s.add ( descriptorsAdd );
+      shortcuts.add ( descriptorsAdd );
 
       const descriptorsRemove = [
         { shortcut: 'Ctrl+A', handler: singleHandler },
         { shortcut: 'Ctrl+B', handler: singleHandler }
       ];
 
-      s.remove ( descriptorsRemove );
+      shortcuts.remove ( descriptorsRemove );
 
       const descriptorsRemoveMore = [
         { shortcut: 'CmdOrCtrl+K Ctrl+A' }
       ];
 
-      s.remove ( descriptorsRemoveMore[0] );
+      shortcuts.remove ( descriptorsRemoveMore[0] );
 
-      t.is ( getShortcutsNr ( s ), 0 );
+      t.is ( getShortcutsNr ( shortcuts ), 0 );
 
-      t.deepEqual ( s.get (), [] );
+      t.deepEqual ( shortcuts.get (), [] );
 
     });
 
     it ( 'supports removing shortcuts with an hyphen', t => {
 
-      const s = new Shortcuts ();
+      const shortcuts = new Shortcuts ({
+        target: Emitter
+      });
 
       const singleHandler = () => {};
 
@@ -124,24 +139,26 @@ describe ( 'Shortcuts', () => {
         { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: () => {} }
       ];
 
-      s.add ( descriptorsAdd );
+      shortcuts.add ( descriptorsAdd );
 
       const descriptorsRemove = [
         { shortcut: '-Ctrl+A', handler: singleHandler },
         { shortcut: '-CmdOrCtrl+K Ctrl+A' }
       ];
 
-      s.remove ( descriptorsRemove );
+      shortcuts.remove ( descriptorsRemove );
 
-      t.is ( getShortcutsNr ( s ), 0 );
+      t.is ( getShortcutsNr ( shortcuts ), 0 );
 
-      t.deepEqual ( s.get (), [] );
+      t.deepEqual ( shortcuts.get (), [] );
 
     });
 
     it ( 'supports removing all shortcuts at once', t => {
 
-      const s = new Shortcuts ();
+      const shortcuts = new Shortcuts ({
+        target: Emitter
+      });
 
       const descriptorsAdd = [
         { shortcut: 'Ctrl+A', handler: () => {} },
@@ -149,19 +166,19 @@ describe ( 'Shortcuts', () => {
         { shortcut: 'Ctrl+A', handler: () => {} }
       ];
 
-      s.add ( descriptorsAdd );
+      shortcuts.add ( descriptorsAdd );
 
-      t.is ( getShortcutsNr ( s ), 3 );
+      t.is ( getShortcutsNr ( shortcuts ), 3 );
 
       const descriptorsRemove = [
         { shortcut: 'Ctrl+A' },
       ];
 
-      s.remove ( descriptorsRemove );
+      shortcuts.remove ( descriptorsRemove );
 
-      t.is ( getShortcutsNr ( s ), 0 );
+      t.is ( getShortcutsNr ( shortcuts ), 0 );
 
-      t.deepEqual ( s.get (), [] );
+      t.deepEqual ( shortcuts.get (), [] );
 
     });
 
@@ -171,20 +188,22 @@ describe ( 'Shortcuts', () => {
 
     it ( 'removes all shortcuts', t => {
 
-      const s = new Shortcuts ();
+      const shortcuts = new Shortcuts ({
+        target: Emitter
+      });
 
       const descriptors = [
         { shortcut: 'Ctrl+A', handler: () => {} },
         { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: () => {} }
       ];
 
-      s.add ( descriptors );
+      shortcuts.add ( descriptors );
 
-      s.reset ();
+      shortcuts.reset ();
 
-      t.is ( getShortcutsNr ( s ), 0 );
+      t.is ( getShortcutsNr ( shortcuts ), 0 );
 
-      t.deepEqual ( s.get (), [] );
+      t.deepEqual ( shortcuts.get (), [] );
 
     });
 
@@ -194,15 +213,17 @@ describe ( 'Shortcuts', () => {
 
     it ( 'calls the first handler for a shortcut that returns true', t => {
 
-      const s = new Shortcuts ();
+      const shortcuts = new Shortcuts ({
+        target: Emitter
+      });
 
-      const [fn1, res1] = callSpy ( () => {} ),
-            [fn2, res2] = callSpy ( () => true ),
-            [fn3, res3] = callSpy ( () => {} ),
-            [fn4, res4] = callSpy ( () => {} ),
-            [fn5, res5] = callSpy ( () => {} ),
-            [fn6, res6] = callSpy ( () => {} ),
-            [fn7, res7] = callSpy ( () => true );
+      const [fn1, res1] = callSpy ( () => {} );
+      const [fn2, res2] = callSpy ( () => true );
+      const [fn3, res3] = callSpy ( () => {} );
+      const [fn4, res4] = callSpy ( () => {} );
+      const [fn5, res5] = callSpy ( () => {} );
+      const [fn6, res6] = callSpy ( () => {} );
+      const [fn7, res7] = callSpy ( () => true );
 
       const getCalls = () => [res1.calls, res2.calls, res3.calls, res4.calls, res5.calls, res6.calls, res7.calls].join ( '' );
 
@@ -216,21 +237,21 @@ describe ( 'Shortcuts', () => {
         { shortcut: 'CmdOrCtrl+K Ctrl+A', handler: fn7 }
       ];
 
-      s.add ( descriptors );
+      shortcuts.add ( descriptors );
 
-      t.true ( s.trigger ( 'Alt+A' ) );
+      t.true ( shortcuts.trigger ( 'Alt+A' ) );
       t.is ( getCalls (), '0110000' );
 
-      t.false ( s.trigger ( Shortcut.shortcut2id ( 'Ctrl+B' ) ) );
+      t.false ( shortcuts.trigger ( Shortcut.shortcut2id ( 'Ctrl+B' ) ) );
       t.is ( getCalls (), '0111000' );
 
-      t.false ( s.trigger ( 'Ctrl+C' ) );
+      t.false ( shortcuts.trigger ( 'Ctrl+C' ) );
       t.is ( getCalls (), '0111000' );
 
-      t.false ( s.trigger ( 'CmdOrCtrl+K' ) );
+      t.false ( shortcuts.trigger ( 'CmdOrCtrl+K' ) );
       t.is ( getCalls (), '0111000' );
 
-      t.true ( s.trigger ( 'CmdOrCtrl+K Ctrl+A' ) );
+      t.true ( shortcuts.trigger ( 'CmdOrCtrl+K Ctrl+A' ) );
       t.is ( getCalls (), '0111001' );
 
     });
@@ -241,16 +262,18 @@ describe ( 'Shortcuts', () => {
 
     it ( 'works like trigger', t => {
 
-      const s = new Shortcuts ();
+      const shortcuts = new Shortcuts ({
+        target: Emitter
+      });
 
-      const [fn1, res1] = callSpy ( () => {} ),
-            [fn2, res2] = callSpy ( () => true ),
-            [fn3, res3] = callSpy ( () => {} ),
-            [fn4, res4] = callSpy ( () => {} ),
-            [fn5, res5] = callSpy ( () => {} ),
-            [fn6, res6] = callSpy ( () => {} ),
-            [fn7, res7] = callSpy ( () => true ),
-            [fn8, res8] = callSpy ( () => true );
+      const [fn1, res1] = callSpy ( () => {} );
+      const [fn2, res2] = callSpy ( () => true );
+      const [fn3, res3] = callSpy ( () => {} );
+      const [fn4, res4] = callSpy ( () => {} );
+      const [fn5, res5] = callSpy ( () => {} );
+      const [fn6, res6] = callSpy ( () => {} );
+      const [fn7, res7] = callSpy ( () => true );
+      const [fn8, res8] = callSpy ( () => true );
 
       const getCalls = () => [res1.calls, res2.calls, res3.calls, res4.calls, res5.calls, res6.calls, res7.calls, res8.calls].join ( '' );
 
@@ -265,7 +288,7 @@ describe ( 'Shortcuts', () => {
         { shortcut: 'CmdOrCtrl+/', handler: fn8 }
       ];
 
-      s.add ( descriptors );
+      shortcuts.add ( descriptors );
 
       triggerShortcutEvent ( 'Alt+A', 'keydown' );
       triggerShortcutEvent ( 'Alt+A', 'keypress' );
