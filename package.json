@@ -7,16 +7,26 @@
   "main": "dist/index.js",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     },
     "./constants": {
-      "types": "./dist/constants.d.ts",
-      "default": "./dist/constants.js"
+      "import": "./dist/constants.js",
+      "types": "./dist/constants.d.ts"
     },
     "./maps": {
-      "types": "./dist/maps.d.ts",
-      "default": "./dist/maps.js"
+      "import": "./dist/maps.js",
+      "types": "./dist/maps.d.ts"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "constants": [
+        "./dist/constants.d.ts"
+      ],
+      "maps": [
+        "./dist/maps.d.ts"
+      ]
     }
   },
   "scripts": {
