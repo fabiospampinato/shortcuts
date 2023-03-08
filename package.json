@@ -47,7 +47,7 @@
     "performant"
   ],
   "devDependencies": {
-    "benchloop": "^1.3.2",
+    "benchloop": "^2.1.0",
     "call-spy": "^3.0.0",
     "esbuild": "^0.15.13",
     "fava": "^0.0.6",

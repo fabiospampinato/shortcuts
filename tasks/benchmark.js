@@ -8,9 +8,8 @@ import {DESCRIPTOR, DESCRIPTORS} from './fixtures.js';
 
 /* MAIN */
 
-benchmark.defaultOptions = Object.assign ( benchmark.defaultOptions, {
-  iterations: 50000,
-  log: 'compact',
+benchmark.config ({
+  iterations: 50_000,
   beforeEach: ctx => {
     ctx.shortcuts = new Shortcuts ({ target: Emitter });
     ctx.shortcuts.add ( DESCRIPTORS );
