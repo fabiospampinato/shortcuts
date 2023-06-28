@@ -5,53 +5,25 @@
   "version": "2.0.3",
   "type": "module",
   "main": "dist/index.js",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./constants": {
-      "import": "./dist/constants.js",
-      "types": "./dist/constants.d.ts"
-    },
-    "./maps": {
-      "import": "./dist/maps.js",
-      "types": "./dist/maps.d.ts"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      "constants": [
-        "./dist/constants.d.ts"
-      ],
-      "maps": [
-        "./dist/maps.d.ts"
-      ]
-    }
-  },
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "benchmark": "tsex benchmark",
-    "benchmark:watch": "tsex benchmark --watch",
     "clean": "tsex clean",
     "compile": "tsex compile",
     "compile:watch": "tsex compile --watch",
-    "test": "tsex test",
-    "test:watch": "tsex test --watch",
-    "demo:build": "cd demo && mkdir -p dist && esbuild --bundle index.js > ./dist/bundle.js",
-    "demo:build:watch": "cd demo && mkdir -p dist && esbuild --watch --bundle index.js > ./dist/bundle.js",
-    "demo:serve": "cd demo && open index.html",
-    "prepublishOnly": "npm run clean && npm run compile && npm run test"
+    "demo": "vite demo",
+    "prepublishOnly": "tsex prepare"
   },
   "keywords": [
     "shortcuts",
     "performant"
   ],
+  "dependencies": {
+    "shosho": "^1.4.0"
+  },
   "devDependencies": {
-    "benchloop": "^2.1.0",
-    "call-spy": "^3.0.0",
-    "esbuild": "^0.15.13",
-    "fava": "^0.0.6",
-    "tsex": "^1.1.2",
-    "typescript": "^4.8.4"
+    "tsex": "^2.2.4",
+    "typescript": "^4.9.5",
+    "vite": "^4.3.9"
   }
 }

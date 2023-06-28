@@ -1,44 +1,29 @@
 
+/* IMPORT */
+
+import type {Options} from 'shosho';
+
 /* MAIN */
 
-type Chord = string;
-type ChordID = number;
-type Shortcut = string;
-type ShortcutID = ChordID[];
-
-type Disposer = () => void;
-type RecordHandler = ( shortcut: Shortcut ) => void;
-type ShouldHandleEventFunction = ( event: KeyboardEvent ) => boolean;
-
-type ListenerOptions = {
-  capture?: boolean,
-  target?: Node,
-  handler: ( id: ShortcutID, event: KeyboardEvent ) => 0 | 1 | 2 | ShortcutID,
-  shouldHandleEvent?: ShouldHandleEventFunction
+type Descriptor = {
+  handler?: Handler,
+  shortcut: string
 };
 
-type ShortcutsOptions = {
-  capture?: boolean,
-  target?: Node,
-  shortcuts?: ShortcutDescriptor[],
-  shouldHandleEvent?: ShouldHandleEventFunction
+type Disposer = {
+  (): void
 };
 
-type ShortcutsTree = {
-  [id: number]: ShortcutsTree,
-  parent?: ShortcutsTree,
-  id?: ChordID,
-  size: number,
-  handlers: Function[]
+type Handler = {
+  ( event?: Event ): boolean | void
 };
 
-type ShortcutDescriptor = {
-  handler?: ( event: KeyboardEvent ) => boolean | void,
+type Registration = {
+  descriptor: Descriptor,
+  dispose: Disposer,
   shortcut: string
 };
 
 /* EXPORT */
 
-export type {Chord, ChordID, Shortcut, ShortcutID};
-export type {Disposer, RecordHandler, ShouldHandleEventFunction};
-export type {ListenerOptions, ShortcutsOptions, ShortcutsTree, ShortcutDescriptor};
+export type {Descriptor, Disposer, Handler, Options, Registration};

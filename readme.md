@@ -2,12 +2,7 @@
 
 Super performant and feature rich shortcuts management library.
 
-## Features
-
-- **Super performant**: it's about as fast as it gets, I don't think it's possible to do significantly better than this.
-- **Sequences support**: sequences (a.k.a. konami codes), are supported too, so you can bind actions to <kbd>Up Right Down Left</kbd> or whatever shortcuts sequence you want.
-- **Shortcut to Accelerator**: supported shortcuts can be converted to their [Electron's Accelerator](https://electronjs.org/docs/api/accelerator) equivalent.
-- **Shortcut to symbols**: supported shortcuts can be converted to symbols (e.g. `⌘A`), this is useful for providing shortcut hints in tooltips.
+This library is just a thin wrapper over [`ShoSho`](https://github.com/fabiospampinato/shosho) that provides a VSCode-like interface for managing shortcuts. Definitely check out [`ShoSho`](https://github.com/fabiospampinato/shosho), which provides more features and it may offer a lower-level but maybe more convenient API for your use case.
 
 ## Install
 
@@ -17,113 +12,95 @@ npm install --save shortcuts
 
 ## Usage
 
-This library provides a [`Shortcuts`](#shortcuts-class) class, which will manage your [shortcuts](#shortcut-syntax), and a [`Shortcut`](#shortcut-object) object, which provides some utilities.
-
-### Shortcut Syntax
-
-The following keys can be used when defining a shortcut:
-
-- **Modifiers**: <kbd>Alt</kbd>/<kbd>Option</kbd>, <kbd>Cmd</kbd>/<kbd>Command</kbd>/<kbd>Meta</kbd>, <kbd>Ctrl</kbd>/<kbd>Control</kbd>, <kbd>Shift</kbd>, <kbd>CmdOrCtrl</kbd>/<kbd>CommandOrControl</kbd>.
-- **Digits**: <kbd>1-9</kbd>.
-- **Alphabet letters**: <kbd>A-Z</kbd>.
-- **Function keys**: <kbd>F1-F24</kbd>.
-- **Numpad digits**: <kbd>Numpad0-Numpad9</kbd>.
-- **Special keys**: <kbd>Backspace</kbd>, <kbd>Capslock</kbd>, <kbd>Del</kbd>/<kbd>Delete</kbd>, <kbd>Down</kbd>, <kbd>End</kbd>, <kbd>Enter</kbd>/<kbd>Return</kbd>, <kbd>Esc</kbd>/<kbd>Escape</kbd>, <kbd>Home</kbd>, <kbd>Insert</kbd>, <kbd>Left</kbd>, <kbd>PageDown</kbd>, <kbd>PageUp</kbd>, <kbd>Right</kbd>, <kbd>Space</kbd>/<kbd>Spacebar</kbd>, <kbd>Tab</kbd>, <kbd>Up</kbd>.
-- **Punctuation keys**: <kbd>!</kbd>, <kbd>"</kbd>, <kbd>#</kbd>, <kbd>$</kbd>, <kbd>%</kbd>, <kbd>&</kbd>, <kbd>'</kbd>, <kbd>(</kbd>, <kbd>)</kbd>, <kbd>*</kbd>, <kbd>+</kbd>/<kbd>plus</kbd>, <kbd>,</kbd>, <kbd>-</kbd>, <kbd>.</kbd>, <kbd>/</kbd>, <kbd>:</kbd>, <kbd>;</kbd>, <kbd><</kbd>, <kbd>=</kbd>, <kbd>></kbd>, <kbd>?</kbd>, <kbd>@</kbd>, <kbd>[</kbd>, <kbd>\\</kbd>, <kbd>]</kbd>, <kbd>^</kbd>, <kbd>_</kbd>, <kbd>`</kbd>, <kbd>{</kbd>, <kbd>|</kbd>, <kbd>}</kbd>, <kbd>~</kbd>.
-
-Other keys are not supported.
-
-- ℹ️ Shortcuts are case insensitive.
-- ℹ️ Keys in a single shortcut must be joined by a plus sign (e.g. <kbd>Ctrl+A</kbd>).
-- ℹ️ Sequences of shortcuts must be joined by a space (e.g. <kbd>Ctrl+K Ctrl+B</kbd>).
-
-### Shortcuts Class
-
-The Shortcuts class will be used for adding/removing/resetting/recording shortcuts. This is its interface:
+The following interface is provided:
 
 ```ts
-class Shortcuts {
-  constructor ( options?: { shortcuts?: ShortcutDescriptor[]: capture?: boolean, target?: Node, shouldHandleEvent?: event => boolean } );
-  get (): ShortcutDescriptor[];
-  add ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] );
-  remove ( descriptors: ShortcutDescriptor | ShortcutDescriptor[] );
-  reset ();
-  record ( handler: ( shortcut ) => any ): Function;
-}
-```
-
-- ℹ️ The `shortcuts` option accepts an optional array of shortcuts descriptors. More on this below.
-- ℹ️ The `capture` option governs whether events are attached for the capturing phase or for the bubbling phase of the propagation.
-- ℹ️ The `target` option accepts an optional DOM node, where the keyboard evenr listener will be attached to.
-- ℹ️ The `shouldHandleEvent` option accepts an optional function which will be used for determining, for each keyboard event, if it should be handled by this library. By default that function is: `event => !event.defaultPrevented`.
-
-A shortcut descriptor looks like this:
-
-```ts
-{
-  handler?: ( event: KeyboardEvent ) => boolean | void,
+type Descriptor = {
+  handler?: ( event?: Event ): boolean | void,
   shortcut: string
+};
+
+type Disposer = {
+  (): void
+};
+
+type Options = {
+  capture?: boolean,
+  target?: Window | Document | HTMLElement | SVGElement | MathMLElement,
+  shouldHandleEvent?: ( event: Event ) => boolean
+};
+
+class Shortcuts {
+  constructor ( options: Options );
+  get (): Descriptor[];
+  add ( descriptor: Descriptor | Descriptor[] ): void;
+  register ( descriptor: Descriptor | Descriptor[] ): Disposer;
+  remove ( descriptor: Descriptor | Descriptor[] ): void;
+  reset (): void;
+  trigger ( shortcut: string ): boolean;
+  start (): void;
+  stop (): void;
 }
 ```
 
-Usage:
+This is how you'd use the library:
 
 ```ts
 import {Shortcuts} from 'shortcuts';
 
-const shortcuts = new Shortcuts ();
+// Let's create a new shortcuts manager instance
 
-function CtrlBHandler () {};
-
-shortcuts.add ([ // Adding some shortcuts
-  { shortcut: 'Ctrl+A', handler: event => {
-    console.log ( event );
-    return true; // Returning true because we don't want other handlers for the same shortcut to be called later
-  }},
-  { shortcut: 'Ctrl+B', handler: CtrlBHandler },
-  { shortcut: 'CmdOrCtrl+K Shift+B', handler: () => {
-    // Doing something...
-    return true; // Returning true because we don't want other handlers for the same shortcut to be called later
-  }},
-  { shortcut: '-Ctrl+A' } // Removing the previous shortcut
-]);
-
-shortcuts.remove ({ shortcut: 'Ctrl-B', handler: CtrlBHandler }); // Removing a single handler
-shortcuts.remove ({ shortcut: 'Ctrl-A' }); // Removing all handlers bound to this shortcut
-
-shortcuts.reset (); // Removing all shortcuts
-
-const dispose = shortcuts.record ( shortcut => { // Recording shortcuts
-  console.log ( 'Shortcut recorded:', shortcut );
+const shortcuts = new Shortcuts ({
+  capture: true, // Handle events during the capturing phase
+  target: document, // Listening for events on the document object
+  shouldHandleEvent ( event ) {
+    return true; // Handle all possible events
+  }
 });
 
-dispose (); // Stopping recording
-```
+// Let's register and unregister some shortcuts
+// Handlers are filtered by shortcut and executed from bottom to top, stopping at the first handler that returns true
 
-- ℹ️ Handlers are called from the bottom to the top, so an handler defined at the bottom will take precedence over an handler for the same shortcut defined at the top.
-- ℹ️ If multiple handlers are defined for the same shortcut all of them are executed until one of them returns `true`.
-- ℹ️ Adding a shortcut starting with an hyphen (e.g. `-Ctrl-A`) will actually remove that shortcut.
-- ℹ️ While recording no handlers will be called.
+const onCtrlB = () => {};
 
-### Shortcut Object
+shortcuts.add ([
+  {
+    shortcut: 'Ctrl+A',
+    handler: () => {
+      // Doing something...
+      return true; // Returning true if we don't want other handlers for the same shortcut to be called later
+    }
+  },
+  {
+    shortcut: 'Ctrl+B',
+    handler: onCtrlB
+  },
+  {
+    shortcut: 'CmdOrCtrl+K Shift+B',
+    handler: () => {
+      // Doing something...
+      return true; // Returning true if we don't want other handlers for the same shortcut to be called later
+    }
+  },
+  {
+    shortcut: '-Ctrl+A' // Removing all previously-registered handlers for "Ctrl+A"
+  }
+]);
 
-The Shortcut object provides some utilities that you might need in your application. This is its interface:
+shortcuts.remove ({ shortcut: 'Ctrl+B', handler: onCtrlB }); // Removing a specific handler bound to this shortcut
+shortcuts.remove ({ shortcut: 'Ctrl+A' }); // Removing all handlers bound to this shortcut
 
-```ts
-const Shortcut = {
-  shortcut2id ( shortcut: string ): number[];
-  shortcut2accelerator ( shortcut: string ): string;
-  shortcut2symbols ( shortcut: string ): string;
-};
-```
+// Let's actually start listening for shortcuts
 
-Usage:
+shortcuts.start ();
 
-```ts
-import {Shortcut} from 'shortcuts';
+// Let's stop listening for shortcuts
 
-Shortcut.shortcut2accelerator ( 'Meta+Del' ); // => 'Cmd+Delete'
-Shortcut.shortcut2symbols ( 'Cmd+Shift+A' ); // => '⌘⇧A'
+shortcuts.stop ();
+
+// Let's dispose of all registered shortcuts
+
+shortcuts.reset ();
 ```
 
 ## Thanks
