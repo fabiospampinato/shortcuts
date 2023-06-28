@@ -2,7 +2,7 @@
   "name": "shortcuts",
   "repository": "github:fabiospampinato/shortcuts",
   "description": "Super performant and feature rich shortcuts management library.",
-  "version": "2.0.3",
+  "version": "3.0.0",
   "type": "module",
   "main": "dist/index.js",
   "exports": "./dist/index.js",
