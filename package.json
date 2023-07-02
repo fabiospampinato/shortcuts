@@ -19,7 +19,7 @@
     "performant"
   ],
   "dependencies": {
-    "shosho": "^1.4.0"
+    "shosho": "^1.4.2"
   },
   "devDependencies": {
     "tsex": "^2.2.4",

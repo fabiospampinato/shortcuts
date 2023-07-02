@@ -2,8 +2,7 @@
 /* IMPORT */
 
 import ShoSho from 'shosho';
-import {FORMAT} from './constants';
-import {castArray} from './utils';
+import {castArray, shortcut2id} from './utils';
 import type {Descriptor, Disposer, Handler, Options, Registration} from './types';
 
 /* MAIN */
@@ -45,7 +44,7 @@ class Shortcuts {
       } else if ( descriptor.handler ) {
 
         const dispose = this.shosho.register ( descriptor.shortcut, descriptor.handler );
-        const shortcut = ShoSho.format ( descriptor.shortcut, FORMAT );
+        const shortcut = shortcut2id ( descriptor.shortcut );
         const registration = { descriptor, dispose, shortcut };
 
         this.registrations.push ( registration );
@@ -79,7 +78,7 @@ class Shortcuts {
     for ( const descriptor of descriptors ) {
 
       const handler = descriptor.handler;
-      const shortcut = ShoSho.format ( descriptor.shortcut.replace ( /^-/, '' ), FORMAT );
+      const shortcut = shortcut2id ( descriptor.shortcut.replace ( /^-/, ''  ) );
 
       this.registrations = this.registrations.filter ( registration => {
 
