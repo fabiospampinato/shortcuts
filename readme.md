@@ -46,7 +46,7 @@ class Shortcuts {
 This is how you'd use the library:
 
 ```ts
-import {Shortcuts} from 'shortcuts';
+import Shortcuts from 'shortcuts';
 
 // Let's create a new shortcuts manager instance
 
